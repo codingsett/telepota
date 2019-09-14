@@ -1,0 +1,10 @@
+*.pyc
+.idea/
+telepot.egg-info/
+dist/
+experiments/
+doc/_build/
+todo.txt
+.remote-sync.json
+.pypirc
+bugs/
