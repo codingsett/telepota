@@ -1,4 +1,5 @@
 def _apply_entities(text, entities, escape_map, format_map):
+
     def inside_entities(i):
         return any(map(lambda e:
                        e['offset'] <= i < e['offset'] + e['length'],
@@ -8,7 +9,7 @@ def _apply_entities(text, entities, escape_map, format_map):
     # preserve index positions.
     seq = list(map(lambda c, i:
                    escape_map[c]  # escape special characters
-                   if c in escape_map and not inside_entities(i)
+                   if c in escape_map
                    else c,
                    list(text),  # split string to char sequence
                    range(0, len(text))))  # along with each char's index
@@ -37,7 +38,7 @@ def _apply_entities(text, entities, escape_map, format_map):
 
 def apply_entities_as_markdown(text, entities):
     """
-    Format text as Markdown. Also take care of escaping special characters.
+    Format text as MarkdownV2. Also take care of escaping special characters.
     Returned value can be passed to :meth:`.Bot.sendMessage` with appropriate
     ``parse_mode``.
 
@@ -47,17 +48,37 @@ def apply_entities_as_markdown(text, entities):
     :param entities:
         a list of `MessageEntity <https://core.telegram.org/bots/api#messageentity>`_ objects
     """
-    escapes = {'*': '\\*',
-               '_': '\\_',
-               '[': '\\[',
-               '`': '\\`', }
+    escapes = {
+            '*': '\\*',
+            '_': '\\_',
+            '[': '\\[',
+            ']': '\\]',
+            '`': '\\`',
+            '(': '\\(',
+            ')': '\\)',
+            '~': '\\~',
+            '>': '\\>',
+            '#': '\\#',
+            '+': '\\+',
+            '-': '\\-',
+            '=': '\\=',
+            '|': '\\|',
+            '{': '\\{',
+            '}': '\\}',
+            '.': '\\.',
+            '!': '\\!'
+            }
 
-    formatters = {'bold': lambda s, e: '*' + s + '*',
-                  'italic': lambda s, e: '_' + s + '_',
-                  'text_link': lambda s, e: '[' + s + '](' + e['url'] + ')',
-                  'text_mention': lambda s, e: '[' + s + '](tg://user?id=' + str(e['user']['id']) + ')',
-                  'code': lambda s, e: '`' + s + '`',
-                  'pre': lambda s, e: '```text\n' + s + '```'}
+    formatters = {
+        'bold': lambda s, e: '*' + s + '*',
+        'italic': lambda s, e: '_' + s + '_',
+        'text_link': lambda s, e: '[' + s + '](' + e['url'] + ')',
+        'text_mention': lambda s, e: '[' + s + '](tg://user?id=' + str(e['user']['id']) + ')',
+        'code': lambda s, e: '`' + s + '`',
+        'pre': lambda s, e: '```text\n' + s + '```',
+        'underline': lambda s, e: '__' + s + '__',
+        'strikethrough': lambda s, e: '~' + s + '~'
+        }
 
     return _apply_entities(text, entities, escapes, formatters)
 
@@ -78,11 +99,15 @@ def apply_entities_as_html(text, entities):
                '>': '&gt;',
                '&': '&amp;', }
 
-    formatters = {'bold': lambda s, e: '<b>' + s + '</b>',
-                  'italic': lambda s, e: '<i>' + s + '</i>',
-                  'text_link': lambda s, e: '<a href="' + e['url'] + '">' + s + '</a>',
-                  'text_mention': lambda s, e: '<a href="tg://user?id=' + str(e['user']['id']) + '">' + s + '</a>',
-                  'code': lambda s, e: '<code>' + s + '</code>',
-                  'pre': lambda s, e: '<pre>' + s + '</pre>'}
+    formatters = {
+        'bold': lambda s, e: '<b>' + s + '</b>',
+        'italic': lambda s, e: '<i>' + s + '</i>',
+        'text_link': lambda s, e: '<a href="' + e['url'] + '">' + s + '</a>',
+        'text_mention': lambda s, e: '<a href="tg://user?id=' + str(e['user']['id']) + '">' + s + '</a>',
+        'code': lambda s, e: '<code>' + s + '</code>',
+        'pre': lambda s, e: '<pre>' + s + '</pre>',
+        'underline': lambda s, e: '<u>' + s + '</u>',
+        'strikethrough': lambda s, e: '<s>' + s + '</s>'
+        }
 
     return _apply_entities(text, entities, escapes, formatters)

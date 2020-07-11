@@ -17,7 +17,6 @@ from . import hack
 
 from . import exception
 
-
 __version_info__ = (12, 7)
 __version__ = '.'.join(map(str, __version_info__))
 
@@ -71,10 +70,11 @@ def _find_first_key(d, keys):
 all_content_types = [
     'text', 'audio', 'document', 'game', 'photo', 'sticker', 'video', 'voice', 'video_note',
     'contact', 'location', 'venue', 'new_chat_member', 'left_chat_member', 'new_chat_title',
-    'new_chat_photo',  'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
+    'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message',
     'new_chat_members', 'invoice', 'successful_payment'
 ]
+
 
 def glance(msg, flavor='chat', long=False):
     """
@@ -120,6 +120,7 @@ def glance(msg, flavor='chat', long=False):
     - short: (``msg['id']``, ``msg['from']['id']``, ``msg['invoice_payload']``)
     - long: (``msg['id']``, ``msg['from']['id']``, ``msg['invoice_payload']``, ``msg['currency']``, ``msg['total_amount']``)
     """
+
     def gl_chat():
         content_type = _find_first_key(msg, all_content_types)
 
@@ -170,7 +171,7 @@ def flance(msg, long=False):
     """
     f = flavor(msg)
     g = glance(msg, flavor=f, long=long)
-    return f,g
+    return f, g
 
 
 def peel(event):
@@ -211,6 +212,7 @@ def origin_identifier(msg):
     else:
         raise ValueError()
 
+
 def message_identifier(msg):
     """
     Extract an identifier for message editing. Useful with :meth:`telepot.Bot.editMessageText`
@@ -225,6 +227,7 @@ def message_identifier(msg):
     else:
         raise ValueError()
 
+
 def _dismantle_message_identifier(f):
     if isinstance(f, tuple):
         if len(f) == 2:
@@ -235,6 +238,7 @@ def _dismantle_message_identifier(f):
             raise ValueError()
     else:
         return {'inline_message_id': f}
+
 
 def _split_input_media_array(media_array):
     def ensure_dict(input_media):
@@ -297,14 +301,17 @@ PY_3 = sys.version_info.major >= 3
 _string_type = str if PY_3 else basestring
 _file_type = io.IOBase if PY_3 else file
 
+
 def _isstring(s):
     return isinstance(s, _string_type)
+
 
 def _isfile(f):
     return isinstance(f, _file_type)
 
 
 from . import helper
+
 
 def flavor_router(routing_table):
     router = helper.Router(flavor, routing_table)
@@ -318,16 +325,23 @@ class _BotBase(object):
 
 
 def _strip(params, more=[]):
-    return {key: value for key,value in params.items() if key not in ['self']+more}
+    return {key: value for key, value in params.items() if key not in ['self'] + more}
+
 
 def _rectify(params):
+
+    # Update markdown to use markdownV2(enhanced version of previous markdown) without need of
+    # specifying it in parse_mode
+    params.update({'parse_mode': 'MarkdownV2' if str(params['parse_mode']).lower() == 'markdown'
+                                 else params['parse_mode']})
+
     def make_jsonable(value):
         if isinstance(value, list):
             return [make_jsonable(v) for v in value]
         elif isinstance(value, dict):
-            return {k:make_jsonable(v) for k,v in value.items() if v is not None}
+            return {k: make_jsonable(v) for k, v in value.items() if v is not None}
         elif isinstance(value, tuple) and hasattr(value, '_asdict'):
-            return {k:make_jsonable(v) for k,v in value._asdict().items() if v is not None}
+            return {k: make_jsonable(v) for k, v in value._asdict().items() if v is not None}
         else:
             return value
 
@@ -335,15 +349,16 @@ def _rectify(params):
         v = make_jsonable(value)
 
         if isinstance(v, (dict, list)):
-            return json.dumps(v, separators=(',',':'))
+            return json.dumps(v, separators=(',', ':'))
         else:
             return v
 
     # remove None, then json-serialize if needed
-    return {k: flatten(v) for k,v in params.items() if v is not None}
+    return {k: flatten(v) for k, v in params.items() if v is not None}
 
 
 from . import api
+
 
 class Bot(_BotBase):
     class Scheduler(threading.Thread):
@@ -366,6 +381,7 @@ class Bot(_BotBase):
             def k(self, *args, **kwargs):
                 with self._lock:
                     return fn(self, *args, **kwargs)
+
             return k
 
         @_locked
@@ -424,7 +440,7 @@ class Bot(_BotBase):
             :type data: dictionary
             :return: an internal Event object
             """
-            return self._insert_event(data, time.time()+delay)
+            return self._insert_event(data, time.time() + delay)
 
         def event_now(self, data):
             """
@@ -473,8 +489,8 @@ class Bot(_BotBase):
                                               'callback_query': lambda msg: self.on_callback_query(msg),
                                               'inline_query': lambda msg: self.on_inline_query(msg),
                                               'chosen_inline_result': lambda msg: self.on_chosen_inline_result(msg)})
-                                              # use lambda to delay evaluation of self.on_ZZZ to runtime because
-                                              # I don't want to require defining all methods right here.
+        # use lambda to delay evaluation of self.on_ZZZ to runtime because
+        # I don't want to require defining all methods right here.
 
     @property
     def scheduler(self):
@@ -1233,10 +1249,10 @@ class Bot(_BotBase):
             dictify = dictify3 if sys.version_info >= (3,) else dictify27
 
             # Here is the re-ordering mechanism, ensuring in-order delivery of updates.
-            max_id = None                 # max update_id passed to callback
+            max_id = None  # max update_id passed to callback
             buffer = collections.deque()  # keep those updates which skip some update_id
-            qwait = None                  # how long to wait for updates,
-                                          # because buffer's content has to be returned in time.
+            qwait = None  # how long to wait for updates,
+            # because buffer's content has to be returned in time.
 
             while 1:
                 try:
@@ -1257,7 +1273,8 @@ class Bot(_BotBase):
                             while 1:
                                 try:
                                     if type(buffer[0]) is dict:
-                                        max_id = relay_to_collector(buffer.popleft())  # updates that arrived earlier, handle them.
+                                        max_id = relay_to_collector(
+                                            buffer.popleft())  # updates that arrived earlier, handle them.
                                     else:
                                         break  # gap, no more contagious updates
                                 except IndexError:
@@ -1272,7 +1289,7 @@ class Bot(_BotBase):
                         else:
                             # buffer too short, lengthen it
                             expire = time.time() + maxhold
-                            for a in range(nbuf, update['update_id']-max_id-1):
+                            for a in range(nbuf, update['update_id'] - max_id - 1):
                                 buffer.append(expire)  # put expiry time in gaps
                             buffer.append(update)
 
@@ -1342,6 +1359,7 @@ class Bot(_BotBase):
 
 import inspect
 
+
 class SpeakerBot(Bot):
     def __init__(self, token):
         super(SpeakerBot, self).__init__(token)
@@ -1364,7 +1382,7 @@ class DelegatorBot(SpeakerBot):
         :param delegation_patterns: a list of (seeder, delegator) tuples.
         """
         super(DelegatorBot, self).__init__(token)
-        self._delegate_records = [p+({},) for p in delegation_patterns]
+        self._delegate_records = [p + ({},) for p in delegation_patterns]
 
     def _startable(self, delegate):
         return ((hasattr(delegate, 'start') and inspect.ismethod(delegate.start)) and
@@ -1382,7 +1400,8 @@ class DelegatorBot(SpeakerBot):
             func, args, kwargs = delegate
             return threading.Thread(target=func, args=args, kwargs=kwargs)
         else:
-            raise RuntimeError('Delegate does not have the required methods, is not callable, and is not a valid tuple.')
+            raise RuntimeError(
+                'Delegate does not have the required methods, is not callable, and is not a valid tuple.')
 
     def handle(self, msg):
         self._mic.send(msg)

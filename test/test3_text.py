@@ -2,9 +2,10 @@ import sys
 import time
 import telepot
 from telepot.text import apply_entities_as_markdown, apply_entities_as_html
+import telepot.test_settings as st
 
-TOKEN = sys.argv[1]
-USER_ID = int(sys.argv[2])
+TOKEN = st.TOKEN
+USER_ID = int(st.USERID)
 
 bot = telepot.Bot(TOKEN)
 
@@ -26,14 +27,30 @@ Do you know what it does?''',
     'ab_cd_*efg*`h`[ijkl](http://www.yahoo.com/)',
     'a*bcdefg*h[user](' + user_link + ')',
     '''Markdown examples:
-*1.* \\*bold text\\*
-_2._ \\_italic text\\_
-3. \\[inline URL](http://www.example.com/)
-`4.` \\`inline fixed-width code\\`''',
+*1\\.* \\*bold text\\*
+_2\\._ \\_italic text\\_
+3\\. \\[inline URL\]\(http://www\.example\.com/\)
+`4\\.` \\`inline fixed\-width code\\`''',
+
+'''*bold \*text*
+_italic \*text_
+__underline__
+~strikethrough~
+*bold _italic bold ~italic bold strikethrough~ __underline italic bold___ bold*
+[inline URL](http://www.example.com/)
+[inline mention of a user](tg://user?id=123456789)
+`inline fixed-width code`
+```
+pre-formatted fixed-width code block
+```
+```python
+pre-formatted fixed-width code block written in the Python programming language
+```'''
 ]
 
 print('Testing Markdown ...')
 for s in markdowns:
+    print(s)
     msg = bot.sendMessage(USER_ID, s, parse_mode='Markdown')
 
     u = apply_entities_as_markdown(msg['text'], msg['entities'])
@@ -69,17 +86,17 @@ Do you know what it does?''',
 <code>4.</code> &lt;code&gt;inline fixed-width code&lt;/code&gt;''',
 ]
 
-print('Testing HTML ...')
-for s in htmls:
-    msg = bot.sendMessage(USER_ID, s, parse_mode='HTML')
-
-    u = apply_entities_as_html(msg['text'], msg['entities'])
-
-    if s == u:
-        print('Identical')
-    else:
-        print('Different:')
-        print('Original ->', s)
-        print('Applied ->', u)
-
-    time.sleep(2)
+# print('Testing HTML ...')
+# for s in htmls:
+#     msg = bot.sendMessage(USER_ID, s, parse_mode='HTML')
+#
+#     u = apply_entities_as_html(msg['text'], msg['entities'])
+#
+#     if s == u:
+#         print('Identical')
+#     else:
+#         print('Different:')
+#         print('Original ->', s)
+#         print('Applied ->', u)
+#
+#     time.sleep(2)
