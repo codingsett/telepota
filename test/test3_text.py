@@ -86,17 +86,17 @@ Do you know what it does?''',
 <code>4.</code> &lt;code&gt;inline fixed-width code&lt;/code&gt;''',
 ]
 
-# print('Testing HTML ...')
-# for s in htmls:
-#     msg = bot.sendMessage(USER_ID, s, parse_mode='HTML')
-#
-#     u = apply_entities_as_html(msg['text'], msg['entities'])
-#
-#     if s == u:
-#         print('Identical')
-#     else:
-#         print('Different:')
-#         print('Original ->', s)
-#         print('Applied ->', u)
-#
-#     time.sleep(2)
+print('Testing HTML ...')
+for s in htmls:
+    msg = bot.sendMessage(USER_ID, s, parse_mode='HTML')
+
+    u = apply_entities_as_html(msg['text'], msg['entities'])
+
+    if s == u:
+        print('Identical')
+    else:
+        print('Different:')
+        print('Original ->', s)
+        print('Applied ->', u)
+
+    time.sleep(2)

@@ -1,10 +1,5 @@
 def _apply_entities(text, entities, escape_map, format_map):
 
-    def inside_entities(i):
-        return any(map(lambda e:
-                       e['offset'] <= i < e['offset'] + e['length'],
-                       entities))
-
     # Split string into char sequence and escape in-place to
     # preserve index positions.
     seq = list(map(lambda c, i:
