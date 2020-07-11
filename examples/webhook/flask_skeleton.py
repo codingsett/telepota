@@ -11,13 +11,16 @@ Webhook path is '/webhook', therefore:
 <webhook_url>: https://<base>/webhook
 """
 
+
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     print('Chat Message:', content_type, chat_type, chat_id)
 
+
 def on_callback_query(msg):
     query_id, from_id, data = telepot.glance(msg, flavor='callback_query')
     print('Callback query:', query_id, from_id, data)
+
 
 # need `/setinline`
 def on_inline_query(msg):
@@ -26,9 +29,10 @@ def on_inline_query(msg):
 
     # Compose your own answers
     articles = [{'type': 'article',
-                    'id': 'abc', 'title': 'ABC', 'message_text': 'Good morning'}]
+                 'id': 'abc', 'title': 'ABC', 'message_text': 'Good morning'}]
 
     bot.answerInlineQuery(query_id, articles)
+
 
 # need `/setinlinefeedback`
 def on_chosen_inline_result(msg):
@@ -47,10 +51,12 @@ webhook = OrderedWebhook(bot, {'chat': on_chat_message,
                                'inline_query': on_inline_query,
                                'chosen_inline_result': on_chosen_inline_result})
 
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def pass_update():
     webhook.feed(request.data)
     return 'OK'
+
 
 if __name__ == '__main__':
     try:

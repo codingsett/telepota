@@ -5,6 +5,7 @@ import telepot.namedtuple
 from telepot.routing import by_content_type, make_content_type_routing_table
 from telepot.exception import NotEnoughRightsError
 
+
 class AdminBot(telepot.Bot):
     def on_chat_message(self, msg):
         content_type, chat_type, chat_id = telepot.glance(msg)

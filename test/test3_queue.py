@@ -3,8 +3,10 @@ import queue
 import telepot
 from telepot.loop import OrderedWebhook
 
+
 def u(update_id):
-    return { 'update_id': update_id, 'message': update_id }
+    return {'update_id': update_id, 'message': update_id}
+
 
 sequence = [
     u(1),  # initialize
@@ -18,8 +20,8 @@ sequence = [
     u(6),  # clear 2
 
     u(10),  # 2-gap
-    u(9),   # 1-gap
-    u(8),   # clear 3
+    u(9),  # 1-gap
+    u(8),  # clear 3
 
     u(15),
     u(12),
@@ -67,8 +69,10 @@ sequence = [
     u(40),  # return
 ]
 
+
 def handle(msg):
     print(msg)
+
 
 bot = telepot.Bot('abc')
 webhook = OrderedWebhook(bot, handle)

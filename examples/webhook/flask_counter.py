@@ -12,6 +12,7 @@ Webhook path is '/webhook', therefore:
 <webhook_url>: https://<base>/webhook
 """
 
+
 class MessageCounter(telepot.helper.ChatHandler):
     def __init__(self, *args, **kwargs):
         super(MessageCounter, self).__init__(*args, **kwargs)
@@ -35,10 +36,12 @@ bot = telepot.DelegatorBot(TOKEN, [
 
 webhook = OrderedWebhook(bot)
 
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def pass_update():
     webhook.feed(request.data)
     return 'OK'
+
 
 if __name__ == '__main__':
     try:

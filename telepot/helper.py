@@ -26,6 +26,7 @@ class Microphone(object):
         def k(self, *args, **kwargs):
             with self._lock:
                 return func(self, *args, **kwargs)
+
         return k
 
     @_locked
@@ -130,7 +131,7 @@ class Sender(object):
                        'sendVenue',
                        'sendContact',
                        'sendGame',
-                       'sendChatAction',]:
+                       'sendChatAction', ]:
             setattr(self, method, partial(getattr(bot, method), chat_id))
             # Essentially doing:
             #   self.sendMessage = partial(bot.sendMessage, chat_id)
@@ -433,6 +434,7 @@ class CallbackQueryCoordinator(object):
             sent message contains an inline keyboard with callback data. If so,
             future callback query originating from the sent message will be captured.
         """
+
         def augmented(*aa, **kw):
             sent = send_func(*aa, **kw)
 
@@ -440,6 +442,7 @@ class CallbackQueryCoordinator(object):
                 self.capture_origin(message_identifier(sent))
 
             return sent
+
         return augmented
 
     def augment_edit(self, edit_func):
@@ -453,6 +456,7 @@ class CallbackQueryCoordinator(object):
             future callback query originating from the edited message will be captured.
             If not, such capturing will be stopped.
         """
+
         def augmented(msg_identifier, *aa, **kw):
             edited = edit_func(msg_identifier, *aa, **kw)
 
@@ -463,6 +467,7 @@ class CallbackQueryCoordinator(object):
                     self.uncapture_origin(msg_identifier)
 
             return edited
+
         return augmented
 
     def augment_delete(self, delete_func):
@@ -474,6 +479,7 @@ class CallbackQueryCoordinator(object):
             a function that wraps around ``delete_func`` and stops capturing
             callback query originating from that deleted message.
         """
+
         def augmented(msg_identifier, *aa, **kw):
             deleted = delete_func(msg_identifier, *aa, **kw)
 
@@ -481,6 +487,7 @@ class CallbackQueryCoordinator(object):
                 self.uncapture_origin(msg_identifier)
 
             return deleted
+
         return augmented
 
     def augment_on_message(self, handler):
@@ -494,6 +501,7 @@ class CallbackQueryCoordinator(object):
             field. If so, future callback query originating from this chosen
             inline result will be captured.
         """
+
         def augmented(msg):
             if (self._enable_inline
                     and flavor(msg) == 'chosen_inline_result'
@@ -502,6 +510,7 @@ class CallbackQueryCoordinator(object):
                 self.capture_origin(inline_message_id)
 
             return handler(msg)
+
         return augmented
 
     def augment_bot(self, bot):
@@ -514,6 +523,7 @@ class CallbackQueryCoordinator(object):
             - ``deleteMessage()`` augmented by :meth:`augment_delete`
             - all other public methods, including properties, copied unchanged
         """
+
         # Because a plain object cannot be set attributes, we need a class.
         class BotProxy(object):
             pass
@@ -534,14 +544,14 @@ class CallbackQueryCoordinator(object):
                         'sendContact',
                         'sendGame',
                         'sendInvoice',
-                        'sendChatAction',]
+                        'sendChatAction', ]
 
         for method in send_methods:
             setattr(proxy, method, self.augment_send(getattr(bot, method)))
 
         edit_methods = ['editMessageText',
                         'editMessageCaption',
-                        'editMessageReplyMarkup',]
+                        'editMessageReplyMarkup', ]
 
         for method in edit_methods:
             setattr(proxy, method, self.augment_edit(getattr(bot, method)))
@@ -580,6 +590,7 @@ class SafeDict(dict):
         def k(self, *args, **kwargs):
             with self._lock:
                 return func(self, *args, **kwargs)
+
         return k
 
     @_locked
@@ -596,6 +607,7 @@ class SafeDict(dict):
 
 
 _cqc_origins = SafeDict()
+
 
 class InterceptCallbackQueryMixin(object):
     """
@@ -669,8 +681,8 @@ class IdleEventCoordinator(object):
         # Ensure a new event is scheduled always
         finally:
             self._timeout_event = self._scheduler.event_later(
-                                      self._timeout_seconds,
-                                      ('_idle', {'seconds': self._timeout_seconds}))
+                self._timeout_seconds,
+                ('_idle', {'seconds': self._timeout_seconds}))
 
     def augment_on_message(self, handler):
         """
@@ -678,6 +690,7 @@ class IdleEventCoordinator(object):
             a function wrapping ``handler`` to refresh timer for every
             non-event message
         """
+
         def augmented(msg):
             # Reset timer if this is an external message
             is_event(msg) or self.refresh()
@@ -687,6 +700,7 @@ class IdleEventCoordinator(object):
                 return
 
             return handler(msg)
+
         return augmented
 
     def augment_on_close(self, handler):
@@ -694,6 +708,7 @@ class IdleEventCoordinator(object):
         :return:
             a function wrapping ``handler`` to cancel timeout event
         """
+
         def augmented(ex):
             try:
                 if self._timeout_event:
@@ -704,6 +719,7 @@ class IdleEventCoordinator(object):
             except exception.EventNotFound:
                 self._timeout_event = None
             return handler(ex)
+
         return augmented
 
 
@@ -755,6 +771,7 @@ class StandardEventScheduler(object):
     Events scheduled through this object always have the second-level ``source`` key fixed,
     while the flavor and other data may be customized.
     """
+
     def __init__(self, scheduler, event_space, source_id):
         self._base = scheduler
         self._event_space = event_space
@@ -1023,9 +1040,9 @@ class Router(object):
         k = self.key_function(msg)
 
         if isinstance(k, (tuple, list)):
-            key, args, kwargs = {1: tuple(k) + ((),{}),
+            key, args, kwargs = {1: tuple(k) + ((), {}),
                                  2: tuple(k) + ({},),
-                                 3: tuple(k),}[len(k)]
+                                 3: tuple(k), }[len(k)]
         else:
             key, args, kwargs = k, (), {}
 
@@ -1045,6 +1062,7 @@ class DefaultRouterMixin(object):
     """
     Install a default :class:`.Router` and the instance method ``on_message()``.
     """
+
     def __init__(self, *args, **kwargs):
         self._router = Router(flavor, {'chat': lambda msg: self.on_chat_message(msg),
                                        'callback_query': lambda msg: self.on_callback_query(msg),
@@ -1053,8 +1071,8 @@ class DefaultRouterMixin(object):
                                        'shipping_query': lambda msg: self.on_shipping_query(msg),
                                        'pre_checkout_query': lambda msg: self.on_pre_checkout_query(msg),
                                        '_idle': lambda event: self.on__idle(event)})
-                                       # use lambda to delay evaluation of self.on_ZZZ to runtime because
-                                       # I don't want to require defining all methods right here.
+        # use lambda to delay evaluation of self.on_ZZZ to runtime because
+        # I don't want to require defining all methods right here.
 
         super(DefaultRouterMixin, self).__init__(*args, **kwargs)
 
@@ -1109,7 +1127,7 @@ class UserHandler(UserContext,
                   IdleTerminateMixin):
     def __init__(self, seed_tuple,
                  include_callback_query=False,
-                 flavors=chat_flavors+inline_flavors, **kwargs):
+                 flavors=chat_flavors + inline_flavors, **kwargs):
         """
         A delegate to handle a user's actions.
 
@@ -1137,9 +1155,7 @@ class InlineUserHandler(UserHandler):
 
 
 @openable
-class CallbackQueryOriginHandler(CallbackQueryOriginContext,
-                                 DefaultRouterMixin,
-                                 StandardEventMixin,
+class CallbackQueryOriginHandler(CallbackQueryOriginContext, DefaultRouterMixin, StandardEventMixin,
                                  IdleTerminateMixin):
     def __init__(self, seed_tuple, **kwargs):
         """
@@ -1150,15 +1166,12 @@ class CallbackQueryOriginHandler(CallbackQueryOriginContext,
 
         self.listener.capture([
             lambda msg:
-                flavor(msg) == 'callback_query' and origin_identifier(msg) == self.origin
+            flavor(msg) == 'callback_query' and origin_identifier(msg) == self.origin
         ])
 
 
 @openable
-class InvoiceHandler(InvoiceContext,
-                     DefaultRouterMixin,
-                     StandardEventMixin,
-                     IdleTerminateMixin):
+class InvoiceHandler(InvoiceContext, DefaultRouterMixin, StandardEventMixin, IdleTerminateMixin):
     def __init__(self, seed_tuple, **kwargs):
         """
         A delegate to handle messages related to an invoice.

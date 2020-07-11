@@ -79,7 +79,7 @@ class MessageLoop(object):
     async def run_forever(self, *args, **kwargs):
         updatesloop = GetUpdatesLoop(self._bot,
                                      lambda update:
-                                         self._handle(_extract_message(update)[1]))
+                                     self._handle(_extract_message(update)[1]))
 
         self._task = self._bot.loop.create_task(updatesloop.run_forever(*args, **kwargs))
 
@@ -121,10 +121,10 @@ class OrderedWebhook(object):
                 return update['update_id']
 
         # Here is the re-ordering mechanism, ensuring in-order delivery of updates.
-        max_id = None                 # max update_id passed to callback
+        max_id = None  # max update_id passed to callback
         buffer = collections.deque()  # keep those updates which skip some update_id
-        qwait = None                  # how long to wait for updates,
-                                      # because buffer's content has to be returned in time.
+        qwait = None  # how long to wait for updates,
+        # because buffer's content has to be returned in time.
 
         while 1:
             try:
@@ -144,7 +144,8 @@ class OrderedWebhook(object):
                         while 1:
                             try:
                                 if type(buffer[0]) is dict:
-                                    max_id = extract_handle(buffer.popleft())  # updates that arrived earlier, handle them.
+                                    max_id = extract_handle(
+                                        buffer.popleft())  # updates that arrived earlier, handle them.
                                 else:
                                     break  # gap, no more contagious updates
                             except IndexError:
@@ -159,7 +160,7 @@ class OrderedWebhook(object):
                     else:
                         # buffer too short, lengthen it
                         expire = time.time() + maxhold
-                        for a in range(nbuf, update['update_id']-max_id-1):
+                        for a in range(nbuf, update['update_id'] - max_id - 1):
                             buffer.append(expire)  # put expiry time in gaps
                         buffer.append(update)
 

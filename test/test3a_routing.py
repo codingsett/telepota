@@ -3,8 +3,9 @@ import asyncio
 import random
 import telepot.aio
 from telepot.aio.routing import (by_content_type, make_content_type_routing_table,
-                                   lower_key, by_chat_command, make_routing_table,
-                                   by_regex)
+                                 lower_key, by_chat_command, make_routing_table,
+                                 by_regex)
+
 
 def random_key(msg):
     return random.choice([
@@ -16,33 +17,41 @@ def random_key(msg):
         ((None,), ()),
     ])
 
+
 def zero(msg):
     print('Zero')
+
 
 def one(msg):
     print('One')
 
+
 def two(msg, a1):
     print('Two', a1)
+
 
 def three(msg, a1, a2, b1):
     print('Three', a1, a2, b1)
 
+
 def none_tuple(msg):
     print('None tuple')
+
 
 def none_of_above(msg, *args, **kwargs):
     print('None of above', msg, args, kwargs)
 
+
 top_router = telepot.aio.helper.Router(random_key, {0: zero,
-                                                      1: one,
-                                                      2: two,
-                                                      3: three,
-                                                      (None,): none_tuple,
-                                                      None: none_of_above})
+                                                    1: one,
+                                                    2: two,
+                                                    3: three,
+                                                    (None,): none_tuple,
+                                                    None: none_of_above})
+
 
 async def fake0():
-    for i in range(0,20):
+    for i in range(0, 20):
         await top_router.route({})
     print()
 
@@ -54,9 +63,11 @@ class ContentTypeHandler(object):
     def on_photo(self, msg, photo):
         print('Photo', msg, photo)
 
+
 def make_message_like(mm):
     for d in mm:
         d.update({'chat': {'type': 'private', 'id': 1000}})
+
 
 async def fake1():
     top_router.key_function = by_content_type()
@@ -66,10 +77,10 @@ async def fake1():
 
     messages = [{'text': 'abc'},
                 {'photo': 'some photo'},
-                {'video': 'some video'},]
+                {'video': 'some video'}, ]
     make_message_like(messages)
 
-    for i in range(0,10):
+    for i in range(0, 10):
         await top_router.route(random.choice(messages))
     print()
 
@@ -87,14 +98,16 @@ class CommandHandler(object):
     def on_invalid_command(self, msg):
         print('Invalid command', msg)
 
+
 command_handler = CommandHandler()
 command_router = telepot.aio.helper.Router(lower_key(by_chat_command()),
-                                             make_routing_table(command_handler, [
-                                                 'start',
-                                                 'settings',
-                                                 ((None,), command_handler.on_invalid_text),
-                                                 (None, command_handler.on_invalid_command),
-                                             ]))
+                                           make_routing_table(command_handler, [
+                                               'start',
+                                               'settings',
+                                               ((None,), command_handler.on_invalid_text),
+                                               (None, command_handler.on_invalid_command),
+                                           ]))
+
 
 async def fake2():
     top_router.routing_table['text'] = command_router.route
@@ -104,10 +117,10 @@ async def fake2():
                 {'text': '/bad'},
                 {'text': 'plain text'},
                 {'photo': 'some photo'},
-                {'video': 'some video'},]
+                {'video': 'some video'}, ]
     make_message_like(messages)
 
-    for i in range(0,20):
+    for i in range(0, 20):
         await top_router.route(random.choice(messages))
     print()
 
@@ -125,14 +138,16 @@ class RegexHandler(object):
     def course_not_exist(self, msg, match):
         print('%s does not exist' % match.group(1), msg)
 
+
 regex_handler = RegexHandler()
 regex_router = telepot.aio.helper.Router(by_regex(lambda msg: msg['text'], '(CS[0-9]{3})'),
-                                           make_routing_table(regex_handler, [
-                                               'CS101',
-                                               'CS202',
-                                               ((None,), regex_handler.no_cs_courses_mentioned),
-                                               (None, regex_handler.course_not_exist),
-                                           ]))
+                                         make_routing_table(regex_handler, [
+                                             'CS101',
+                                             'CS202',
+                                             ((None,), regex_handler.no_cs_courses_mentioned),
+                                             (None, regex_handler.course_not_exist),
+                                         ]))
+
 
 async def fake3():
     command_router.routing_table[(None,)] = regex_router.route
@@ -146,10 +161,10 @@ async def fake3():
                 {'text': 'Why don\'t you take CS303?'},
                 {'text': 'I hate computer science!'},
                 {'photo': 'some photo'},
-                {'video': 'some video'},]
+                {'video': 'some video'}, ]
     make_message_like(messages)
 
-    for i in range(0,30):
+    for i in range(0, 30):
         await top_router.route(random.choice(messages))
     print()
 

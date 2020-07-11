@@ -11,6 +11,7 @@ import telepot
 import telepot.namedtuple
 import telepot.aio
 
+
 def equivalent(data, nt):
     if type(data) is dict:
         keys = list(data.keys())
@@ -20,13 +21,14 @@ def equivalent(data, nt):
             return False
 
         # map `from` to `from_`
-        fields = list([k+'_' if k in ['from'] else k for k in keys])
+        fields = list([k + '_' if k in ['from'] else k for k in keys])
 
         return all(map(equivalent, [data[k] for k in keys], [getattr(nt, f) for f in fields]))
     elif type(data) is list:
         return all(map(equivalent, data, nt))
     else:
-        return data==nt
+        return data == nt
+
 
 def examine(result, type):
     try:
@@ -44,6 +46,7 @@ def examine(result, type):
         answer = input()
         if answer != 'y':
             exit(1)
+
 
 async def send_everything(msg):
     content_type, chat_type, chat_id, msg_date, msg_id = telepot.glance(msg, long=True)
@@ -68,7 +71,8 @@ async def send_everything(msg):
     r = await bot.sendMessage(chat_id, '中文')
     examine(r, telepot.namedtuple.Message)
 
-    r = await bot.sendMessage(chat_id, '*bold text*\n_italic text_\n[link](http://www.google.com)', parse_mode='Markdown')
+    r = await bot.sendMessage(chat_id, '*bold text*\n_italic text_\n[link](http://www.google.com)',
+                              parse_mode='Markdown')
     examine(r, telepot.namedtuple.Message)
 
     await bot.sendMessage(chat_id, 'http://www.yahoo.com\nwith web page preview')
@@ -99,9 +103,11 @@ async def send_everything(msg):
 
     file_id = r['photo'][0]['file_id']
 
-    await bot.sendPhoto(chat_id, file_id, caption='Show original message and keyboard', reply_to_message_id=msg_id, reply_markup=nt_show_keyboard)
+    await bot.sendPhoto(chat_id, file_id, caption='Show original message and keyboard', reply_to_message_id=msg_id,
+                        reply_markup=nt_show_keyboard)
 
-    await bot.sendPhoto(chat_id, file_id, caption='_Hide keyboard_', parse_mode='Markdown', reply_markup=remove_keyboard)
+    await bot.sendPhoto(chat_id, file_id, caption='_Hide keyboard_', parse_mode='Markdown',
+                        reply_markup=remove_keyboard)
 
     async with aiohttp.ClientSession() as session:
         async with session.get('http://i.imgur.com/35HSRQ6.png') as r:
@@ -140,7 +146,8 @@ async def send_everything(msg):
 
     file_id = r['audio']['file_id']
 
-    await bot.sendAudio(chat_id, file_id, duration=6, performer='Ding Dong', title='Ringtone', reply_to_message_id=msg_id, reply_markup=show_keyboard)
+    await bot.sendAudio(chat_id, file_id, duration=6, performer='Ding Dong', title='Ringtone',
+                        reply_to_message_id=msg_id, reply_markup=show_keyboard)
 
     await bot.sendAudio(chat_id, file_id, performer='Ding Dong', reply_markup=nt_remove_keyboard)
 
@@ -180,7 +187,8 @@ async def send_everything(msg):
     try:
         file_id = r['video']['file_id']
 
-        await bot.sendVideo(chat_id, file_id, duration=5, caption='Hong Kong traffic', reply_to_message_id=msg_id, reply_markup=nt_show_keyboard)
+        await bot.sendVideo(chat_id, file_id, duration=5, caption='Hong Kong traffic', reply_to_message_id=msg_id,
+                            reply_markup=nt_show_keyboard)
         await bot.sendVideo(chat_id, file_id, reply_markup=remove_keyboard)
 
     except KeyError:
@@ -214,11 +222,13 @@ async def send_everything(msg):
 
     ##### sendMediaGroup
 
-    with open('lighthouse.jpg', 'rb') as f1, open('gandhi.png', 'rb') as f2, open('bookshelf.jpg', 'rb') as f3, open('saturn.jpg', 'rb') as f4:
+    with open('lighthouse.jpg', 'rb') as f1, open('gandhi.png', 'rb') as f2, open('bookshelf.jpg', 'rb') as f3, open(
+            'saturn.jpg', 'rb') as f4:
         ms = [
             telepot.namedtuple.InputMediaPhoto(media=f1),
             telepot.namedtuple.InputMediaPhoto(media=('media2', f2)),
-            telepot.namedtuple.InputMediaPhoto(media='https://telegram.org/file/811140935/175c/FSf2aidnuaY.21715.gif/31dc2dbb6902dcef78'),
+            telepot.namedtuple.InputMediaPhoto(
+                media='https://telegram.org/file/811140935/175c/FSf2aidnuaY.21715.gif/31dc2dbb6902dcef78'),
             {'type': 'photo', 'media': ('media3', ('books.jpg', f3))},
             {'type': 'photo', 'media': f4},
         ]
@@ -230,7 +240,8 @@ async def send_everything(msg):
     r = await bot.sendLocation(chat_id, 22.33, 114.18)  # Hong Kong
     examine(r, telepot.namedtuple.Message)
 
-    await bot.sendLocation(chat_id, 49.25, -123.1, reply_to_message_id=msg_id, reply_markup=nt_show_keyboard)  # Vancouver
+    await bot.sendLocation(chat_id, 49.25, -123.1, reply_to_message_id=msg_id,
+                           reply_markup=nt_show_keyboard)  # Vancouver
 
     await bot.sendLocation(chat_id, -37.82, 144.97, reply_markup=remove_keyboard)  # Melbourne
 
@@ -251,20 +262,22 @@ async def send_everything(msg):
     await bot.sendGame(chat_id, 'sunchaser')
 
     game_keyboard = telepot.namedtuple.InlineKeyboardMarkup(inline_keyboard=[[
-                        telepot.namedtuple.InlineKeyboardButton(text='Play now', callback_game=True),
-                        telepot.namedtuple.InlineKeyboardButton(text='How to play?', url='https://mygame.com/howto'),
-                    ]])
+        telepot.namedtuple.InlineKeyboardButton(text='Play now', callback_game=True),
+        telepot.namedtuple.InlineKeyboardButton(text='How to play?', url='https://mygame.com/howto'),
+    ]])
     await bot.sendGame(chat_id, 'sunchaser', reply_markup=game_keyboard)
 
     ##### Done sending messages
 
     await bot.sendMessage(chat_id, 'I am done.')
 
+
 async def get_user_profile_photos():
     print('Getting user profile photos ...')
 
     r = await bot.getUserProfilePhotos(USER_ID)
     examine(r, telepot.namedtuple.UserProfilePhotos)
+
 
 async def test_webhook_getupdates_exclusive():
     await bot.setWebhook('https://www.fake.com/fake', open('old.cert', 'rb'))
@@ -282,9 +295,10 @@ async def test_webhook_getupdates_exclusive():
 
 expected_content_type = None
 content_type_iterator = iter([
-    'text', 'voice', 'sticker', 'photo', 'audio' ,'document', 'video', 'contact', 'location',
-    'new_chat_member',  'new_chat_title', 'new_chat_photo',  'delete_chat_photo', 'left_chat_member'
+    'text', 'voice', 'sticker', 'photo', 'audio', 'document', 'video', 'contact', 'location',
+    'new_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'left_chat_member'
 ])
+
 
 async def see_every_content_types(msg):
     global expected_content_type, content_type_iterator
@@ -302,13 +316,15 @@ async def see_every_content_types(msg):
             expected_content_type = next(content_type_iterator)
             await bot.sendMessage(chat_id, 'Please give me a %s.' % expected_content_type)
         else:
-            await bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (expected_content_type, expected_content_type))
+            await bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (
+            expected_content_type, expected_content_type))
     except StopIteration:
         # reply to sender because I am kicked from group already
         await bot.sendMessage(from_id, 'Thank you. I am done.')
 
 
 STEP = 1
+
 
 async def handle(msg):
     global STEP, expected_content_type, content_type_iterator

@@ -89,6 +89,7 @@ def _dictify3(data):
     else:
         raise ValueError()
 
+
 def _dictify27(data):
     if type(data) in [str, unicode]:
         return json.loads(data)
@@ -97,7 +98,9 @@ def _dictify27(data):
     else:
         raise ValueError()
 
+
 _dictify = _dictify3 if sys.version_info >= (3,) else _dictify27
+
 
 def _extract_message(update):
     key = _find_first_key(update, ['message',
@@ -110,6 +113,7 @@ def _extract_message(update):
                                    'shipping_query',
                                    'pre_checkout_query'])
     return key, update[key]
+
 
 def _infer_handler_function(bot, h):
     if h is None:
@@ -150,8 +154,8 @@ class MessageLoop(RunForeverAsThread):
         collectloop = CollectLoop(self._handle)
         updatesloop = GetUpdatesLoop(self._bot,
                                      lambda update:
-                                         collectloop.input_queue.put(_extract_message(update)[1]))
-                                         # feed messages to collect loop
+                                     collectloop.input_queue.put(_extract_message(update)[1]))
+        # feed messages to collect loop
         # feed events to collect loop
         self._bot.scheduler.on_event(collectloop.input_queue.put)
         self._bot.scheduler.run_as_thread()
@@ -192,10 +196,10 @@ class Orderer(RunForeverAsThread):
             return update['update_id']
 
         # Here is the re-ordering mechanism, ensuring in-order delivery of updates.
-        max_id = None                 # max update_id passed to callback
+        max_id = None  # max update_id passed to callback
         buffer = collections.deque()  # keep those updates which skip some update_id
-        qwait = None                  # how long to wait for updates,
-                                      # because buffer's content has to be returned in time.
+        qwait = None  # how long to wait for updates,
+        # because buffer's content has to be returned in time.
 
         while 1:
             try:
@@ -230,7 +234,7 @@ class Orderer(RunForeverAsThread):
                     else:
                         # buffer too short, lengthen it
                         expire = time.time() + maxhold
-                        for a in range(nbuf, update['update_id']-max_id-1):
+                        for a in range(nbuf, update['update_id'] - max_id - 1):
                             buffer.append(expire)  # put expiry time in gaps
                         buffer.append(update)
 
@@ -277,8 +281,8 @@ class OrderedWebhook(RunForeverAsThread):
         self._bot = bot
         self._collectloop = CollectLoop(_infer_handler_function(bot, handle))
         self._orderer = Orderer(lambda update:
-                                    self._collectloop.input_queue.put(_extract_message(update)[1]))
-                                    # feed messages to collect loop
+                                self._collectloop.input_queue.put(_extract_message(update)[1]))
+        # feed messages to collect loop
 
     def run_forever(self, *args, **kwargs):
         """

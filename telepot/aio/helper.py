@@ -22,6 +22,7 @@ def _create_invoker(obj, method_name):
     async def d(*a, **kw):
         method = getattr(obj, method_name)
         return await _invoke(method, *a, **kw)
+
     return d
 
 
@@ -60,6 +61,7 @@ class Listener(helper.Listener):
 
 
 from concurrent.futures._base import CancelledError
+
 
 class Answerer(object):
     """
@@ -142,6 +144,7 @@ class CallbackQueryCoordinator(helper.CallbackQueryCoordinator):
                 self.capture_origin(message_identifier(sent))
 
             return sent
+
         return augmented
 
     def augment_edit(self, edit_func):
@@ -155,6 +158,7 @@ class CallbackQueryCoordinator(helper.CallbackQueryCoordinator):
                     self.uncapture_origin(msg_identifier)
 
             return edited
+
         return augmented
 
     def augment_delete(self, delete_func):
@@ -165,6 +169,7 @@ class CallbackQueryCoordinator(helper.CallbackQueryCoordinator):
                 self.uncapture_origin(msg_identifier)
 
             return deleted
+
         return augmented
 
     def augment_on_message(self, handler):
@@ -176,6 +181,7 @@ class CallbackQueryCoordinator(helper.CallbackQueryCoordinator):
                 self.capture_origin(inline_message_id)
 
             return await _invoke(handler, msg)
+
         return augmented
 
 
@@ -189,6 +195,7 @@ class IdleEventCoordinator(helper.IdleEventCoordinator):
             # Reset timer if this is an external message
             is_event(msg) or self.refresh()
             return await _invoke(handler, msg)
+
         return augmented
 
     def augment_on_close(self, handler):
@@ -202,6 +209,7 @@ class IdleEventCoordinator(helper.IdleEventCoordinator):
             except exception.EventNotFound:
                 self._timeout_event = None
             return await _invoke(handler, ex)
+
         return augmented
 
 
@@ -226,9 +234,9 @@ class Router(helper.Router):
         k = self.key_function(msg)
 
         if isinstance(k, (tuple, list)):
-            key, args, kwargs = {1: tuple(k) + ((),{}),
+            key, args, kwargs = {1: tuple(k) + ((), {}),
                                  2: tuple(k) + ({},),
-                                 3: tuple(k),}[len(k)]
+                                 3: tuple(k), }[len(k)]
         else:
             key, args, kwargs = k, (), {}
 
@@ -311,7 +319,7 @@ class UserHandler(helper.UserContext,
                   IdleTerminateMixin):
     def __init__(self, seed_tuple,
                  include_callback_query=False,
-                 flavors=chat_flavors+inline_flavors, **kwargs):
+                 flavors=chat_flavors + inline_flavors, **kwargs):
         """
         A delegate to handle a user's actions.
 
@@ -352,7 +360,7 @@ class CallbackQueryOriginHandler(helper.CallbackQueryOriginContext,
 
         self.listener.capture([
             lambda msg:
-                flavor(msg) == 'callback_query' and origin_identifier(msg) == self.origin
+            flavor(msg) == 'callback_query' and origin_identifier(msg) == self.origin
         ])
 
 

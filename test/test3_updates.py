@@ -24,6 +24,7 @@ And send it a message anyway. It will print out your user id as an unauthorized 
 Ctrl-C to kill it, then run the proper command again.
 """
 
+
 def equivalent(data, nt):
     if type(data) is dict:
         keys = list(data.keys())
@@ -33,13 +34,14 @@ def equivalent(data, nt):
             return False
 
         # map `from` to `from_`
-        fields = list([k+'_' if k in ['from'] else k for k in keys])
+        fields = list([k + '_' if k in ['from'] else k for k in keys])
 
         return all(map(equivalent, [data[k] for k in keys], [getattr(nt, f) for f in fields]))
     elif type(data) is list:
         return all(map(equivalent, data, nt))
     else:
-        return data==nt
+        return data == nt
+
 
 def examine(result, type):
     try:
@@ -57,11 +59,13 @@ def examine(result, type):
         if answer != 'y':
             exit(1)
 
+
 expected_content_type = None
 content_type_iterator = iter([
-    'text', 'voice', 'sticker', 'photo', 'audio' ,'document', 'video', 'contact', 'location',
-    'new_chat_member',  'new_chat_title', 'new_chat_photo',  'delete_chat_photo', 'left_chat_member'
+    'text', 'voice', 'sticker', 'photo', 'audio', 'document', 'video', 'contact', 'location',
+    'new_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'left_chat_member'
 ])
+
 
 def see_every_content_types(msg):
     global expected_content_type, content_type_iterator
@@ -79,10 +83,12 @@ def see_every_content_types(msg):
             expected_content_type = next(content_type_iterator)
             bot.sendMessage(chat_id, 'Please give me a %s.' % expected_content_type)
         else:
-            bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (expected_content_type, expected_content_type))
+            bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (
+            expected_content_type, expected_content_type))
     except StopIteration:
         # reply to sender because I am kicked from group already
         bot.sendMessage(from_id, 'Thank you. I am done.')
+
 
 TOKEN = sys.argv[1]
 USER_ID = int(sys.argv[2])

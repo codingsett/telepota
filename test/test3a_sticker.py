@@ -4,6 +4,7 @@ from pprint import pprint
 import telepot.aio
 from telepot.namedtuple import StickerSet
 
+
 async def test_sticker():
     f = await bot.uploadStickerFile(USER_ID, open('gandhi.png', 'rb'))
     print('Uploaded Gandhi')
@@ -24,6 +25,7 @@ async def test_sticker():
 
     s = await bot.getStickerSet(STICKER_SET)
     pprint(s)
+
 
 TOKEN = sys.argv[1]
 USER_ID = int(sys.argv[2])

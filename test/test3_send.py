@@ -27,6 +27,7 @@ And send it a message anyway. It will print out your user id as an unauthorized 
 Ctrl-C to kill it, then run the proper command again.
 """
 
+
 def equivalent(data, nt):
     if type(data) is dict:
         keys = list(data.keys())
@@ -36,13 +37,14 @@ def equivalent(data, nt):
             return False
 
         # map `from` to `from_`
-        fields = list([k+'_' if k in ['from'] else k for k in keys])
+        fields = list([k + '_' if k in ['from'] else k for k in keys])
 
         return all(map(equivalent, [data[k] for k in keys], [getattr(nt, f) for f in fields]))
     elif type(data) is list:
         return all(map(equivalent, data, nt))
     else:
-        return data==nt
+        return data == nt
+
 
 def examine(result, type):
     try:
@@ -59,6 +61,7 @@ def examine(result, type):
         answer = input('Do you want to continue? [y] ')
         if answer != 'y':
             exit(1)
+
 
 def send_everything_on_contact(msg):
     content_type, chat_type, chat_id, msg_date, msg_id = telepot.glance(msg, long=True)
@@ -121,7 +124,8 @@ def send_everything_on_contact(msg):
 
     file_id = r['photo'][0]['file_id']
 
-    bot.sendPhoto(chat_id, file_id, caption='Show original message and keyboard', reply_to_message_id=msg_id, reply_markup=nt_show_keyboard)
+    bot.sendPhoto(chat_id, file_id, caption='Show original message and keyboard', reply_to_message_id=msg_id,
+                  reply_markup=nt_show_keyboard)
     time.sleep(0.5)
 
     bot.sendPhoto(chat_id, file_id, caption='_Hide keyboard_', parse_mode='Markdown', reply_markup=remove_keyboard)
@@ -164,7 +168,8 @@ def send_everything_on_contact(msg):
 
     file_id = r['audio']['file_id']
 
-    bot.sendAudio(chat_id, file_id, duration=6, performer='Ding Dong', title='Ringtone', reply_to_message_id=msg_id, reply_markup=show_keyboard)
+    bot.sendAudio(chat_id, file_id, duration=6, performer='Ding Dong', title='Ringtone', reply_to_message_id=msg_id,
+                  reply_markup=show_keyboard)
     time.sleep(0.5)
 
     bot.sendAudio(chat_id, file_id, performer='Ding Dong', reply_markup=nt_remove_keyboard)
@@ -215,7 +220,8 @@ def send_everything_on_contact(msg):
     try:
         file_id = r['video']['file_id']
 
-        bot.sendVideo(chat_id, file_id, duration=5, caption='Hong Kong traffic', reply_to_message_id=msg_id, reply_markup=nt_show_keyboard)
+        bot.sendVideo(chat_id, file_id, duration=5, caption='Hong Kong traffic', reply_to_message_id=msg_id,
+                      reply_markup=nt_show_keyboard)
         time.sleep(0.5)
         bot.sendVideo(chat_id, file_id, reply_markup=remove_keyboard)
         time.sleep(0.5)
@@ -256,11 +262,13 @@ def send_everything_on_contact(msg):
 
     ##### sendMediaGroup
 
-    with open('lighthouse.jpg', 'rb') as f1, open('gandhi.png', 'rb') as f2, open('bookshelf.jpg', 'rb') as f3, open('saturn.jpg', 'rb') as f4:
+    with open('lighthouse.jpg', 'rb') as f1, open('gandhi.png', 'rb') as f2, open('bookshelf.jpg', 'rb') as f3, open(
+            'saturn.jpg', 'rb') as f4:
         ms = [
             telepot.namedtuple.InputMediaPhoto(media=f1),
             telepot.namedtuple.InputMediaPhoto(media=('media2', f2)),
-            telepot.namedtuple.InputMediaPhoto(media='https://telegram.org/file/811140935/175c/FSf2aidnuaY.21715.gif/31dc2dbb6902dcef78'),
+            telepot.namedtuple.InputMediaPhoto(
+                media='https://telegram.org/file/811140935/175c/FSf2aidnuaY.21715.gif/31dc2dbb6902dcef78'),
             {'type': 'photo', 'media': ('media3', ('books.jpg', f3))},
             {'type': 'photo', 'media': f4},
         ]
@@ -297,9 +305,9 @@ def send_everything_on_contact(msg):
     time.sleep(0.5)
 
     game_keyboard = telepot.namedtuple.InlineKeyboardMarkup(inline_keyboard=[[
-                        telepot.namedtuple.InlineKeyboardButton(text='Play now', callback_game=True),
-                        telepot.namedtuple.InlineKeyboardButton(text='How to play?', url='https://mygame.com/howto'),
-                    ]])
+        telepot.namedtuple.InlineKeyboardButton(text='Play now', callback_game=True),
+        telepot.namedtuple.InlineKeyboardButton(text='How to play?', url='https://mygame.com/howto'),
+    ]])
     bot.sendGame(chat_id, 'sunchaser', reply_markup=game_keyboard)
     time.sleep(0.5)
 
@@ -307,17 +315,20 @@ def send_everything_on_contact(msg):
 
     bot.sendMessage(chat_id, 'I am done.')
 
+
 def get_user_profile_photos():
     print('Getting user profile photos ...')
 
     r = bot.getUserProfilePhotos(USER_ID)
     examine(r, telepot.namedtuple.UserProfilePhotos)
 
+
 expected_content_type = None
 content_type_iterator = iter([
-    'text', 'voice', 'sticker', 'photo', 'audio' ,'document', 'video', 'contact', 'location',
-    'new_chat_member',  'new_chat_title', 'new_chat_photo',  'delete_chat_photo', 'left_chat_member'
+    'text', 'voice', 'sticker', 'photo', 'audio', 'document', 'video', 'contact', 'location',
+    'new_chat_member', 'new_chat_title', 'new_chat_photo', 'delete_chat_photo', 'left_chat_member'
 ])
+
 
 def see_every_content_types(msg):
     global expected_content_type, content_type_iterator
@@ -335,10 +346,12 @@ def see_every_content_types(msg):
             expected_content_type = next(content_type_iterator)
             bot.sendMessage(chat_id, 'Please give me a %s.' % expected_content_type)
         else:
-            bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (expected_content_type, expected_content_type))
+            bot.sendMessage(chat_id, 'It is not a %s. Please give me a %s, please.' % (
+            expected_content_type, expected_content_type))
     except StopIteration:
         # reply to sender because I am kicked from group already
         bot.sendMessage(from_id, 'Thank you. I am done.')
+
 
 def ask_for_various_messages():
     bot.message_loop(see_every_content_types)
@@ -347,6 +360,7 @@ def ask_for_various_messages():
     expected_content_type = next(content_type_iterator)
 
     bot.sendMessage(USER_ID, 'Please give me a %s.' % expected_content_type)
+
 
 def test_webhook_getupdates_exclusive():
     bot.setWebhook('https://www.fake.com/fake', open('old.cert', 'rb'))

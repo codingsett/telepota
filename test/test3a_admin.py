@@ -6,6 +6,7 @@ import telepot.aio
 from telepot.aio.routing import by_content_type, make_content_type_routing_table
 from telepot.exception import NotEnoughRightsError
 
+
 class AdminBot(telepot.aio.Bot):
     async def on_chat_message(self, msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
@@ -73,7 +74,7 @@ TOKEN = sys.argv[1]
 
 bot = AdminBot(TOKEN)
 loop = asyncio.get_event_loop()
-#loop.set_debug(True)
+# loop.set_debug(True)
 
 loop.create_task(bot.message_loop())
 print('Send me a text message ...')

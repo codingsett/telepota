@@ -11,12 +11,13 @@ _loop = asyncio.get_event_loop()
 
 _pools = {
     'default': aiohttp.ClientSession(
-                   connector=aiohttp.TCPConnector(limit=10),
-                   loop=_loop)
+        connector=aiohttp.TCPConnector(limit=10),
+        loop=_loop)
 }
 
 _timeout = 30
 _proxy = None  # (url, (username, password))
+
 
 def set_proxy(url, basic_auth=None):
     global _proxy
@@ -24,6 +25,7 @@ def set_proxy(url, basic_auth=None):
         _proxy = None
     else:
         _proxy = (url, basic_auth) if basic_auth else (url,)
+
 
 def _proxy_kwargs():
     if _proxy is None or len(_proxy) == 0:
@@ -35,20 +37,25 @@ def _proxy_kwargs():
     else:
         raise RuntimeError("_proxy has invalid length")
 
+
 async def _close_pools():
     global _pools
     for s in _pools.values():
         await s.close()
 
+
 atexit.register(lambda: _loop.create_task(_close_pools()))  # have to wrap async function
+
 
 def _create_onetime_pool():
     return aiohttp.ClientSession(
-               connector=aiohttp.TCPConnector(limit=1, force_close=True),
-               loop=_loop)
+        connector=aiohttp.TCPConnector(limit=1, force_close=True),
+        loop=_loop)
+
 
 def _default_timeout(req, **user_kw):
     return _timeout
+
 
 def _compose_timeout(req, **user_kw):
     token, method, params, files = req
@@ -64,17 +71,18 @@ def _compose_timeout(req, **user_kw):
     else:
         return _default_timeout(req, **user_kw)
 
+
 def _compose_data(req, **user_kw):
     token, method, params, files = req
 
     data = aiohttp.FormData()
 
     if params:
-        for key,value in params.items():
+        for key, value in params.items():
             data.add_field(key, str(value))
 
     if files:
-        for key,f in files.items():
+        for key, f in files.items():
             if isinstance(f, tuple):
                 if len(f) == 2:
                     filename, fileobj = f
@@ -86,6 +94,7 @@ def _compose_data(req, **user_kw):
             data.add_field(key, fileobj, filename=filename)
 
     return data
+
 
 def _transform(req, **user_kw):
     timeout = _compose_timeout(req, **user_kw)
@@ -103,10 +112,11 @@ def _transform(req, **user_kw):
         session = _pools[name]
         cleanup = None  # reuse: do not close
 
-    kwargs = {'data':data}
+    kwargs = {'data': data}
     kwargs.update(user_kw)
 
     return session.post, (url,), kwargs, timeout, cleanup
+
 
 async def _parse(response):
     try:
@@ -125,11 +135,12 @@ async def _parse(response):
         # Look for specific error ...
         for e in exception.TelegramError.__subclasses__():
             n = len(e.DESCRIPTION_PATTERNS)
-            if any(map(re.search, e.DESCRIPTION_PATTERNS, n*[description], n*[re.IGNORECASE])):
+            if any(map(re.search, e.DESCRIPTION_PATTERNS, n * [description], n * [re.IGNORECASE])):
                 raise e(description, error_code, data)
 
         # ... or raise generic error
         raise exception.TelegramError(description, error_code, data)
+
 
 async def request(req, **user_kw):
     fn, args, kwargs, timeout, cleanup = _transform(req, **user_kw)
@@ -157,6 +168,7 @@ async def request(req, **user_kw):
                 await cleanup()
             else:
                 cleanup()
+
 
 def download(req):
     session = _create_onetime_pool()

@@ -13,6 +13,7 @@ from telepot.namedtuple import (
     InlineQuery, ChosenInlineResult, InputTextMessageContent,
     InlineQueryResultArticle, InlineQueryResultPhoto, InlineQueryResultGame)
 
+
 def equivalent(data, nt):
     if type(data) is dict:
         keys = list(data.keys())
@@ -22,13 +23,14 @@ def equivalent(data, nt):
             return False
 
         # map `from` to `from_`
-        fields = list([k+'_' if k in ['from'] else k for k in keys])
+        fields = list([k + '_' if k in ['from'] else k for k in keys])
 
         return all(map(equivalent, [data[k] for k in keys], [getattr(nt, f) for f in fields]))
     elif type(data) is list:
         return all(map(equivalent, data, nt))
     else:
-        return data==nt
+        return data == nt
+
 
 def examine(result, type):
     try:
@@ -51,17 +53,22 @@ def examine(result, type):
 def on_inline_query(msg):
     def compute():
         articles = [InlineQueryResultArticle(
-                       id='abc', title='HK', input_message_content=InputTextMessageContent(message_text='Hong Kong'), url='https://www.google.com', hide_url=True),
-                   {'type': 'article',
-                       'id': 'def', 'title': 'SZ', 'input_message_content': {'message_text': 'Shenzhen'}, 'url': 'https://www.yahoo.com'}]
+            id='abc', title='HK', input_message_content=InputTextMessageContent(message_text='Hong Kong'),
+            url='https://www.google.com', hide_url=True),
+            {'type': 'article',
+             'id': 'def', 'title': 'SZ', 'input_message_content': {'message_text': 'Shenzhen'},
+             'url': 'https://www.yahoo.com'}]
 
         photos = [InlineQueryResultPhoto(
-                      id='123', photo_url='https://core.telegram.org/file/811140934/1/tbDSLHSaijc/fdcc7b6d5fb3354adf', thumb_url='https://core.telegram.org/file/811140934/1/tbDSLHSaijc/fdcc7b6d5fb3354adf'),
-                  {'type': 'photo',
-                      'id': '345', 'photo_url': 'https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd', 'thumb_url': 'https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd', 'caption': 'Caption', 'title': 'Title', 'input_message_content': {'message_text': 'Shenzhen'}}]
+            id='123', photo_url='https://core.telegram.org/file/811140934/1/tbDSLHSaijc/fdcc7b6d5fb3354adf',
+            thumb_url='https://core.telegram.org/file/811140934/1/tbDSLHSaijc/fdcc7b6d5fb3354adf'),
+            {'type': 'photo',
+             'id': '345', 'photo_url': 'https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd',
+             'thumb_url': 'https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd',
+             'caption': 'Caption', 'title': 'Title', 'input_message_content': {'message_text': 'Shenzhen'}}]
 
         games = [InlineQueryResultGame(
-                    id='abc', game_short_name='sunchaser')]
+            id='abc', game_short_name='sunchaser')]
 
         results = random.choice([articles, photos, games])
         return results

@@ -19,20 +19,21 @@ Run it by:
 $ python3.5 script.py <bot-token> <payment-provider-token>
 """
 
+
 async def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     print(content_type, chat_type, chat_id)
 
     if content_type != 'successful_payment':
         sent = await bot.sendInvoice(
-                   chat_id, "Nick's Hand Cream", "Keep a man's hand like a woman's",
-                   payload='a-string-identifying-related-payment-messages-tuvwxyz',
-                   provider_token=PAYMENT_PROVIDER_TOKEN,
-                   start_parameter='abc',
-                   currency='HKD', prices=[
-                       LabeledPrice(label='One Case', amount=987),
-                       LabeledPrice(label='Package', amount=12)],
-                   need_shipping_address=True, is_flexible=True)  # required for shipping query
+            chat_id, "Nick's Hand Cream", "Keep a man's hand like a woman's",
+            payload='a-string-identifying-related-payment-messages-tuvwxyz',
+            provider_token=PAYMENT_PROVIDER_TOKEN,
+            start_parameter='abc',
+            currency='HKD', prices=[
+                LabeledPrice(label='One Case', amount=987),
+                LabeledPrice(label='Package', amount=12)],
+            need_shipping_address=True, is_flexible=True)  # required for shipping query
         # 'Pay' button appears automatically
 
         pprint(sent)
@@ -42,6 +43,7 @@ async def on_chat_message(msg):
         print('Successful payment RECEIVED!!!')
         pprint(msg)
         print(SuccessfulPayment(**msg['successful_payment']))
+
 
 async def on_shipping_query(msg):
     query_id, from_id, invoice_payload = telepot.glance(msg, flavor='shipping_query')
@@ -61,8 +63,10 @@ async def on_shipping_query(msg):
                 LabeledPrice(label='Local', amount=342),
                 LabeledPrice(label='International', amount=1234)])])
 
+
 async def on_pre_checkout_query(msg):
-    query_id, from_id, invoice_payload, currency, total_amount = telepot.glance(msg, flavor='pre_checkout_query', long=True)
+    query_id, from_id, invoice_payload, currency, total_amount = telepot.glance(msg, flavor='pre_checkout_query',
+                                                                                long=True)
 
     print('Pre-Checkout query:')
     print(query_id, from_id, invoice_payload, currency, total_amount)
@@ -70,6 +74,7 @@ async def on_pre_checkout_query(msg):
     print(PreCheckoutQuery(**msg))
 
     await bot.answerPreCheckoutQuery(query_id, True)
+
 
 TOKEN = sys.argv[1]
 PAYMENT_PROVIDER_TOKEN = sys.argv[2]

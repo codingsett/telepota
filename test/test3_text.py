@@ -14,7 +14,7 @@ markdowns = [
     '*abc*de',
     'ab_cd_e',
     '[abcde](http://www.yahoo.com/)',
-    '[user]('+user_link+')',
+    '[user](' + user_link + ')',
     'a`bcd`e',
     '''Below is a function:
 ```text
@@ -24,7 +24,7 @@ def add(a, b):
 Do you know what it does?''',
     'a_bc_de*f*g`hijk`lmno',
     'ab_cd_*efg*`h`[ijkl](http://www.yahoo.com/)',
-    'a*bcdefg*h[user]('+user_link+')',
+    'a*bcdefg*h[user](' + user_link + ')',
     '''Markdown examples:
 *1.* \\*bold text\\*
 _2._ \\_italic text\\_
@@ -47,12 +47,11 @@ for s in markdowns:
 
     time.sleep(2)
 
-
 htmls = [
     'a<b>bcd</b>e',
     '<i>ab</i>cde',
     'ab<a href="http://www.yahoo.com/">cde</a>',
-    'ab<a href="'+user_link+'">user</a>',
+    'ab<a href="' + user_link + '">user</a>',
     'a<code>bcd</code>e',
     '''Below is a function:
 <pre>
@@ -62,7 +61,7 @@ def add(a, b):
 Do you know what it does?''',
     'a<i>bc</i>de<b>f</b>g<code>hijk</code>lmno',
     'ab<i>cd</i><b>efg</b><code>h</code><a href="http://www.yahoo.com/">ijkl</a>',
-    'a<b>bcdefg</b>h<a href="'+user_link+'">user</a>',
+    'a<b>bcdefg</b>h<a href="' + user_link + '">user</a>',
     '''HTML examples:
 <b>1.</b> &lt;b&gt;bold&lt;/b&gt;
 <i>2.</i> &lt;i&gt;italic&lt;/i&gt;

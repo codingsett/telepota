@@ -7,6 +7,7 @@ from ..routing import (
     process_key, lower_key, upper_key
 )
 
+
 def make_routing_table(obj, keys, prefix='on_'):
     """
     :return:
@@ -19,18 +20,20 @@ def make_routing_table(obj, keys, prefix='on_'):
 
     :param prefix: a string to be prepended to keys to make method names
     """
+
     def maptuple(k):
         if isinstance(k, tuple):
             if len(k) == 2:
                 return k
             elif len(k) == 1:
-                return k[0], _create_invoker(obj, prefix+k[0])
+                return k[0], _create_invoker(obj, prefix + k[0])
             else:
                 raise ValueError()
         else:
-            return k, _create_invoker(obj, prefix+k)
+            return k, _create_invoker(obj, prefix + k)
 
     return dict([maptuple(k) for k in keys])
+
 
 def make_content_type_routing_table(obj, prefix='on_'):
     """

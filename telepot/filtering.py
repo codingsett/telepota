@@ -10,6 +10,7 @@ def pick(obj, keys):
     else:
         return pick1(keys)
 
+
 def match(data, template):
     if isinstance(template, dict) and isinstance(data, dict):
         def pick_and_match(kv):
@@ -29,6 +30,7 @@ def match(data, template):
         return template(data)
     else:
         return data == template
+
 
 def match_all(msg, templates):
     return all(map(lambda t: match(msg, t), templates))

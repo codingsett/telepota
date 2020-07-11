@@ -13,6 +13,7 @@ Webhook path is '/webhook', therefore:
 <webhook_url>: https://<base>/webhook
 """
 
+
 class MessageCounter(telepot.aio.helper.ChatHandler):
     def __init__(self, *args, **kwargs):
         super(MessageCounter, self).__init__(*args, **kwargs)
@@ -22,10 +23,12 @@ class MessageCounter(telepot.aio.helper.ChatHandler):
         self._count += 1
         await self.sender.sendMessage(self._count)
 
+
 async def feeder(request):
     data = await request.text()
     webhook.feed(data)
     return web.Response(body='OK'.encode('utf-8'))
+
 
 async def init(app, bot):
     app.router.add_route('GET', '/webhook', feeder)
@@ -44,7 +47,7 @@ app = web.Application(loop=loop)
 bot = telepot.aio.DelegatorBot(TOKEN, [
     pave_event_space()(
         per_chat_id(), create_open, MessageCounter, timeout=10)],
-    loop=loop)
+                               loop=loop)
 webhook = OrderedWebhook(bot)
 
 loop.run_until_complete(init(app, bot))
