@@ -29,15 +29,15 @@ class Microphone(object):
 
         return k
 
-    @_locked
+    @_locked()
     def add(self, q):
         self._queues.add(q)
 
-    @_locked
+    @_locked()
     def remove(self, q):
         self._queues.remove(q)
 
-    @_locked
+    @_locked()
     def send(self, msg):
         for q in self._queues:
             try:
@@ -593,15 +593,15 @@ class SafeDict(dict):
 
         return k
 
-    @_locked
+    @_locked()
     def __getitem__(self, key):
         return super(SafeDict, self).__getitem__(key)
 
-    @_locked
+    @_locked()
     def __setitem__(self, key, value):
         return super(SafeDict, self).__setitem__(key, value)
 
-    @_locked
+    @_locked()
     def __delitem__(self, key):
         return super(SafeDict, self).__delitem__(key)
 

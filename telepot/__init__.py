@@ -603,6 +603,24 @@ class Bot(_BotBase):
         p = _strip(locals(), more=['video'])
         return self._api_request_with_file('sendVideo', _rectify(p), 'video', video)
 
+    def sendAnimation(self, chat_id, animation,
+                    duration=None,
+                    width=None,
+                    height=None,
+                    thumb=None,
+                    caption=None,
+                    parse_mode=None,
+                    disable_notification=None,
+                    reply_to_message_id=None,
+                    reply_markup=None):
+        """
+        See: https://core.telegram.org/bots/api#sendanimation
+
+        :param animation: Same as ``photo`` in :meth:`telepot.Bot.sendPhoto`
+        """
+        p = _strip(locals(), more=['animation'])
+        return self._api_request_with_file('sendAnimation', _rectify(p), 'animation', animation)
+
     def sendVoice(self, chat_id, voice,
                   caption=None,
                   parse_mode=None,
@@ -665,6 +683,19 @@ class Bot(_BotBase):
         p['media'] = legal_media
         return self._api_request('sendMediaGroup', _rectify(p), files_to_attach)
 
+    def editMessageMedia(self, msg_identifier, media, inline_message_id=None, reply_markup=None):
+        """
+        See: https://core.telegram.org/bots/api#editmessagemedia
+
+        :param msg_identifier: Same as in :meth:`.Bot.editMessageText`
+        :param media: Same as in :meth:`.Bot.sendMedia`
+        """
+        p = _strip(locals(), more=['msg_identifier', 'media'])
+        legal_media, files_to_attach = _split_input_media_array(media)
+        p.update(_dismantle_message_identifier(msg_identifier))
+        p['media'] = legal_media
+        return self._api_request('editMessageMedia', _rectify(p), files_to_attach)
+
     def sendLocation(self, chat_id, latitude, longitude,
                      live_period=None,
                      disable_notification=None,
@@ -698,6 +729,7 @@ class Bot(_BotBase):
 
     def sendVenue(self, chat_id, latitude, longitude, title, address,
                   foursquare_id=None,
+                  foursquare_type=None,
                   disable_notification=None,
                   reply_to_message_id=None,
                   reply_markup=None):
@@ -707,6 +739,7 @@ class Bot(_BotBase):
 
     def sendContact(self, chat_id, phone_number, first_name,
                     last_name=None,
+                    vcard=None,
                     disable_notification=None,
                     reply_to_message_id=None,
                     reply_markup=None):
@@ -1036,6 +1069,11 @@ class Bot(_BotBase):
     def getWebhookInfo(self):
         """ See: https://core.telegram.org/bots/api#getwebhookinfo """
         return self._api_request('getWebhookInfo')
+
+    def setPassportDataErrors(self, chat_id, errors):
+        """ See: https://core.telegram.org/bots/api#setpassportdataerrors """
+        p = _strip(locals())
+        return self._api_request('setPassportDataErrors', _rectify(p))
 
     def setGameScore(self, user_id, score, game_message_identifier,
                      force=None,

@@ -50,9 +50,7 @@ pre-formatted fixed-width code block written in the Python programming language
 
 print('Testing Markdown ...')
 for s in markdowns:
-    print(s)
     msg = bot.sendMessage(USER_ID, s, parse_mode='Markdown')
-
     u = apply_entities_as_markdown(msg['text'], msg['entities'])
 
     if s == u:
@@ -84,6 +82,16 @@ Do you know what it does?''',
 <i>2.</i> &lt;i&gt;italic&lt;/i&gt;
 3. &lt;a href="http://www.example.com/"&gt;inline URL&lt;/a&gt;
 <code>4.</code> &lt;code&gt;inline fixed-width code&lt;/code&gt;''',
+    '''<b>bold</b>, <strong>bold</strong>
+<i>italic</i>, <em>italic</em>
+<u>underline</u>, <ins>underline</ins>
+<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
+<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
+<a href="http://www.example.com/">inline URL</a>
+<a href="tg://user?id=883163864">inline mention of a user</a>
+<code>inline fixed-width code</code>
+<pre>pre-formatted fixed-width code block</pre>
+<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>'''
 ]
 
 print('Testing HTML ...')
@@ -99,4 +107,4 @@ for s in htmls:
         print('Original ->', s)
         print('Applied ->', u)
 
-    time.sleep(2)
+    time.sleep(0.5)

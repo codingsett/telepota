@@ -73,13 +73,8 @@ def _filetuple(key, f):
         raise ValueError()
 
 
-import sys
-
-PY_3 = sys.version_info.major >= 3
-
-
 def _fix_type(v):
-    if isinstance(v, float if PY_3 else (long, float)):
+    if isinstance(v, float):
         return str(v)
     else:
         return v

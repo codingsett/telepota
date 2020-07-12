@@ -46,13 +46,15 @@ def _create_class(typename, fields):
                     del kwargs[k]
 
                 s = ('Unexpected fields: ' + ', '.join(unexpected) + ''
-                                                                     '\nBot API seems to have added new fields to the returned data.'
-                                                                     ' This version of namedtuple is not able to capture them.'
-                                                                     '\n\nPlease upgrade telepot by:'
-                                                                     '\n  sudo pip install telepot --upgrade'
-                                                                     '\n\nIf you still see this message after upgrade, that means I am still working to bring the code up-to-date.'
-                                                                     ' Please try upgrade again a few days later.'
-                                                                     ' In the meantime, you can access the new fields the old-fashioned way, through the raw dictionary.')
+                     '\nBot API seems to have added new fields to the returned data.'
+                     ' This version of namedtuple is not able to capture them.'
+                     '\n\nPlease upgrade telepot by:'
+                     '\n  sudo pip install telepot --upgrade'
+                     '\n\nIf you still see this message after upgrade, that means I am still working to '
+                     'bring the code up-to-date.'
+                     ' Please try upgrade again a few days later.'
+                     ' In the meantime, you can access the new fields the old-fashioned way, '
+                     'through the raw dictionary.')
 
                 warnings.warn(s, UserWarning)
 
@@ -150,11 +152,13 @@ PhotoSize = _create_class('PhotoSize', [
 # incoming
 Audio = _create_class('Audio', [
     'file_id',
+    'file_unique_id',
     'duration',
     'performer',
     'title',
     'mime_type',
-    'file_size'
+    'file_size',
+    _Field('thumb', constructor=PhotoSize)
 ])
 
 # incoming
@@ -201,6 +205,19 @@ StickerSet = _create_class('StickerSet', [
 ])
 
 # incoming
+PassportFile = _create_class('PassportFile', [
+    'file_id',
+    'file_unique_id',
+    'file_size',
+    'file_date'
+])
+
+
+def PassportFileArray(data):
+    return [PassportFile(**p) for p in data]
+
+
+# incoming
 Video = _create_class('Video', [
     'file_id',
     'width',
@@ -234,7 +251,8 @@ Contact = _create_class('Contact', [
     'phone_number',
     'first_name',
     'last_name',
-    'user_id'
+    'user_id',
+    'vcard'
 ])
 
 # incoming
@@ -249,6 +267,7 @@ Venue = _create_class('Venue', [
     'title',
     'address',
     'foursquare_id',
+    'foursquare_type'
 ])
 
 # incoming
@@ -348,6 +367,7 @@ MessageEntity = _create_class('MessageEntity', [
     'length',
     'url',
     _Field('user', constructor=User),
+    'language'
 ])
 
 
@@ -366,6 +386,10 @@ GameHighScore = _create_class('GameHighScore', [
 # incoming
 Animation = _create_class('Animation', [
     'file_id',
+    'file_unique_id',
+    'width',
+    'height',
+    'duration',
     _Field('thumb', constructor=PhotoSize),
     'file_name',
     'mime_type',
@@ -453,6 +477,33 @@ SuccessfulPayment = _create_class('SuccessfulPayment', [
 ])
 
 # incoming
+EncryptedCredentials = _create_class('EncryptedCredentials', [
+    'data',
+    'hash',
+    'secret'
+])
+
+# incoming
+EncryptedPassportElement = _create_class('EncryptedPassportElement', [
+    'type',
+    'data',
+    'phone_number',
+    'email',
+    _Field('files', constructor=PassportFile),
+    _Field('front_side', constructor=PassportFile),
+    _Field('reverse_side', constructor=PassportFile),
+    _Field('selfie', constructor=PassportFile),
+    _Field('translation', constructor=PassportFileArray),
+    'hash'
+])
+
+# incoming
+PassportData = _create_class('PassportData', [
+    _Field('data', constructor=EncryptedPassportElement),
+    _Field('credentials', constructor=EncryptedCredentials),
+])
+
+# incoming
 Message = _create_class('Message', [
     'message_id',
     _Field('from_', constructor=User),
@@ -469,6 +520,7 @@ Message = _create_class('Message', [
     'text',
     _Field('entities', constructor=MessageEntityArray),
     _Field('caption_entities', constructor=MessageEntityArray),
+    _Field('animation', constructor=Animation),
     _Field('audio', constructor=Audio),
     _Field('document', constructor=Document),
     _Field('game', constructor=Game),
@@ -480,8 +532,10 @@ Message = _create_class('Message', [
     _Field('new_chat_members', constructor=UserArray),
     'caption',
     _Field('contact', constructor=Contact),
+    _Field('dice', constructor=Dice),
     _Field('location', constructor=Location),
     _Field('venue', constructor=Venue),
+    _Field('poll', constructor=Poll),
     _Field('new_chat_member', constructor=User),
     _Field('left_chat_member', constructor=User),
     'new_chat_title',
@@ -496,6 +550,7 @@ Message = _create_class('Message', [
     _Field('invoice', constructor=Invoice),
     _Field('successful_payment', constructor=SuccessfulPayment),
     'connected_website',
+    _Field('passport_data', constructor=PassportData),
 ])
 
 # incoming
@@ -537,6 +592,10 @@ Update = _create_class('Update', [
     _Field('inline_query', constructor=InlineQuery),
     _Field('chosen_inline_result', constructor=ChosenInlineResult),
     _Field('callback_query', constructor=CallbackQuery),
+    _Field('shipping_query', constructor=ShippingQuery),
+    _Field('pre_checkout_query', constructor=PreCheckoutQuery),
+    _Field('poll', constructor=Poll),
+    _Field('poll_answer', constructor=PollAnswer),
 ])
 
 
@@ -575,6 +634,7 @@ InputVenueMessageContent = _create_class('InputVenueMessageContent', [
     'title',
     'address',
     'foursquare_id',
+    'foursquare_type',
 ])
 
 # outgoing
@@ -582,6 +642,7 @@ InputContactMessageContent = _create_class('InputContactMessageContent', [
     'phone_number',
     'first_name',
     'last_name',
+    'vcard'
 ])
 
 # outgoing
@@ -733,6 +794,7 @@ InlineQueryResultVenue = _create_class('InlineQueryResultVenue', [
     'title',
     'address',
     'foursquare_id',
+    'foursquare_type',
     'reply_markup',
     'input_message_content',
     'thumb_url',
@@ -747,6 +809,7 @@ InlineQueryResultContact = _create_class('InlineQueryResultContact', [
     'phone_number',
     'first_name',
     'last_name',
+    'vcard',
     'reply_markup',
     'input_message_content',
     'thumb_url',
@@ -865,20 +928,137 @@ InputMediaPhoto = _create_class('InputMediaPhoto', [
     'parse_mode',
 ])
 
-# outgoing
-InputMediaVideo = _create_class('InputMediaVideo', [
-    _Field('type', default='video'),
+common_input_media = [
     'media',
+    _Field('thumb', constructor=PhotoSize),
     'caption',
     'parse_mode',
     'width',
     'height',
-    'duration',
+    'duration'
+]
+
+# outgoing
+InputMediaVideo = _create_class('InputMediaVideo', [
+    _Field('type', default='video'),
+    *common_input_media,
     'supports_streaming',
 ])
+
+# outgoing
+InputMediaAnimation = _create_class('InputMediaAnimation', [
+    _Field('type', default='animation'),
+    *common_input_media
+])
+
+# outgoing
+InputMediaAudio = _create_class('InputMediaAudio', [
+    _Field('type', default='audio'),
+    'media',
+    _Field('thumb', constructor=PhotoSize),
+    'caption',
+    'parse_mode',
+    'duration',
+    'performer',
+    'title'
+])
+
+# outgoing
+InputMediaDocument = _create_class('InputMediaAudio', [
+    _Field('type', default='document'),
+    'media',
+    _Field('thumb', constructor=PhotoSize),
+    'caption',
+    'parse_mode',
+])
+
+common_passport_fields = [
+    'type',
+    'file_hash',
+    'message']
+
+# outgoing
+PassportElementErrorDataField = _create_class('PassportElementErrorDataField', [
+    _Field('source', default='data'),
+    'type',
+    'field_name',
+    'data_hash',
+    'message'
+])
+
+#outgoing
+PassportElementErrorFrontSide = _create_class('PassportElementErrorFrontSide', [
+    _Field('source', default='front_side'),
+    *common_passport_fields
+])
+
+#outgoing
+PassportElementErrorReverseSide = _create_class('PassportElementErrorReverseSide', [
+    _Field('source', default='reverse_side'),
+    *common_passport_fields
+])
+
+#outgoing
+PassportElementErrorSelfie = _create_class('PassportElementErrorSelfie', [
+    _Field('source', default='selfie'),
+    *common_passport_fields
+])
+
+#outgoing
+PassportElementErrorFile = _create_class('PassportElementErrorFile', [
+    _Field('source', default='file'),
+    *common_passport_fields
+])
+
+
+#outgoing
+PassportElementErrorFiles = _create_class('PassportElementErrorFiles', [
+    _Field('source', default='files'),
+    'type',
+    'file_hashes'
+    'message'
+])
+
+#outgoing
+PassportElementErrorTranslationFile = _create_class('PassportElementErrorTranslationFile', [
+    _Field('source', default='translation_file'),
+    *common_passport_fields
+])
+
+
+#outgoing
+PassportElementErrorTranslationFiles = _create_class('PassportElementErrorTranslationFiles', [
+    _Field('source', default='translation_files'),
+    'type',
+    'file_hashes'
+    'message'
+])
+
+PassportElementErrorUnspecified = _create_class('PassportElementErrorUnspecified', [
+    _Field('source', default='unspecified'),
+    'type',
+    'element_hash'
+    'message'
+])
+
+#outgoing
+PassportElementError = _create_class('PassportElementError', [
+    _Field('PassportElementErrorDataField', constructor=PassportElementErrorDataField),
+    _Field('PassportElementErrorFrontSide', constructor=PassportElementErrorFrontSide),
+    _Field('PassportElementErrorReverseSide', constructor=PassportElementErrorReverseSide),
+    _Field('PassportElementErrorSelfie', constructor=PassportElementErrorSelfie),
+    _Field('PassportElementErrorFile', constructor=PassportElementErrorFile),
+    _Field('PassportElementErrorFiles', constructor=PassportElementErrorFiles),
+    _Field('PassportElementErrorTranslationFile', constructor=PassportElementErrorTranslationFile),
+    _Field('PassportElementErrorTranslationFiles', constructor=PassportElementErrorTranslationFiles),
+    _Field('PassportElementErrorUnspecified', constructor=PassportElementErrorUnspecified)
+
+])
+
 
 # incoming
 ResponseParameters = _create_class('ResponseParameters', [
     'migrate_to_chat_id',
     'retry_after',
 ])
+
