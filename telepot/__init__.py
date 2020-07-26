@@ -34,7 +34,7 @@ def flavor(msg):
     - ``shipping_query``
     - ``pre_checkout_query``
     - ``passport_data``
-    - ``poll``
+    - ``poll_data``
 
     An event's flavor is determined by the single top-level key.
     """

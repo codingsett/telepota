@@ -109,7 +109,10 @@ User = _create_class('User', [
     'first_name',
     'last_name',
     'username',
-    'language_code'
+    'language_code',
+    'can_join_groups',
+    'can_read_all_group_messages',
+    'supports_inline_queries'
 ])
 
 
@@ -353,11 +356,16 @@ ReplyKeyboardMarkup = _create_class('ReplyKeyboardMarkup', [
     'selective',
 ])
 
+KeyboardButtonPollType = _create_class('KeyboardButtonPollType', [
+    'type'
+])
+
 # outgoing
 KeyboardButton = _create_class('KeyboardButton', [
     'text',
     'request_contact',
     'request_location',
+    _Field('request_poll', constructor=KeyboardButtonPollType)
 ])
 
 # outgoing
