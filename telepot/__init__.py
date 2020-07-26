@@ -834,12 +834,8 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('unbanChatMember', _rectify(p))
 
-    def restrictChatMember(self, chat_id, user_id,
-                           until_date=None,
-                           can_send_messages=None,
-                           can_send_media_messages=None,
-                           can_send_other_messages=None,
-                           can_add_web_page_previews=None):
+    def restrictChatMember(self, chat_id, user_id, permissions,
+                           until_date=None):
         """ See: https://core.telegram.org/bots/api#restrictchatmember """
         p = _strip(locals())
         return self._api_request('restrictChatMember', _rectify(p))
@@ -861,6 +857,11 @@ class Bot(_BotBase):
         """ See: https://core.telegram.org/bots/api#exportchatinvitelink """
         p = _strip(locals())
         return self._api_request('exportChatInviteLink', _rectify(p))
+
+    def setChatPermissions(self, chat_id):
+        """ See: https://core.telegram.org/bots/api#setchatpermissions """
+        p = _strip(locals())
+        return self._api_request('setChatPermissions', _rectify(p))
 
     def setChatPhoto(self, chat_id, photo):
         """ See: https://core.telegram.org/bots/api#setchatphoto """

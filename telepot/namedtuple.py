@@ -118,9 +118,23 @@ def UserArray(data):
 
 
 # incoming
+ChatPermissions = _create_class('ChatPermissions', [
+    'can_send_messages',
+    'can_send_media_messages',
+    'can_send_polls',
+    'can_send_other_messages',
+    'can_add_web_page_previews',
+    'can_change_info',
+    'can_invite_users',
+    'can_pin_messages'
+])
+
+# incoming
 ChatPhoto = _create_class('ChatPhoto', [
     'small_file_id',
+    'small_file_unique_id',
     'big_file_id',
+    'big_file_unique_id'
 ])
 
 # incoming
@@ -131,7 +145,7 @@ Chat = _create_class('Chat', [
     'username',
     'first_name',
     'last_name',
-    'all_members_are_administrators',
+    _Field('permissions', constructor=ChatPermissions),
     _Field('photo', constructor=ChatPhoto),
     'description',
     'invite_link',
@@ -184,6 +198,7 @@ Sticker = _create_class('Sticker', [
     'file_id',
     'width',
     'height',
+    'is_animated',
     _Field('thumb', constructor=PhotoSize),
     'emoji',
     'set_name',
@@ -200,8 +215,10 @@ def StickerArray(data):
 StickerSet = _create_class('StickerSet', [
     'name',
     'title',
+    'is_animated',
     'contains_masks',
     _Field('stickers', constructor=StickerArray),
+    _Field('thumb', constructor=PhotoSize),
 ])
 
 # incoming
@@ -296,6 +313,7 @@ UserProfilePhotos = _create_class('UserProfilePhotos', [
 ChatMember = _create_class('ChatMember', [
     _Field('user', constructor=User),
     'status',
+    'custom_title',
     'is_member',
     'until_date',
     'can_be_edited',
@@ -311,6 +329,7 @@ ChatMember = _create_class('ChatMember', [
     'can_send_media_messages',
     'can_send_other_messages',
     'can_add_web_page_previews',
+    'can_send_polls'
 ])
 
 
@@ -345,7 +364,7 @@ ForceReply = _create_class('ForceReply', [
     'selective',
 ])
 
-LoginUrl = _create_class('ForceReply', [
+LoginUrl = _create_class('LoginUrl', [
     'url',
     'forward_text',
     'bot_username',
