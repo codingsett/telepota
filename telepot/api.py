@@ -142,12 +142,10 @@ def _parse(response):
         data = json.loads(text)
     except ValueError:  # No JSON object could be decoded
         raise exception.BadHTTPResponse(response.status, text, response)
-
     if data['ok']:
         return data['result']
     else:
         description, error_code = data['description'], data['error_code']
-
         # Look for specific error ...
         for e in exception.TelegramError.__subclasses__():
             n = len(e.DESCRIPTION_PATTERNS)
@@ -169,7 +167,10 @@ def _fileurl(req):
     return 'https://api.telegram.org/file/bot%s/%s' % (token, path)
 
 
-def download(req, **user_kw):
+def download(req, dest, **user_kw):
     pool = _create_onetime_pool()
     r = pool.request('GET', _fileurl(req), **user_kw)
-    return r
+    if not dest:
+        return r.read()
+    else:
+        return r

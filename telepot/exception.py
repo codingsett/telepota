@@ -124,3 +124,8 @@ class MigratedToSupergroupChatError(TelegramError):
 
 class NotEnoughRightsError(TelegramError):
     DESCRIPTION_PATTERNS = ['not *enough *rights']
+
+
+class DecryptionError(BaseException):
+    def __init__(self, message):
+        super().__init__(message)

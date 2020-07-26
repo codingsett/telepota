@@ -29,15 +29,15 @@ class Microphone(object):
 
         return k
 
-    @_locked()
+    @_locked
     def add(self, q):
         self._queues.add(q)
 
-    @_locked()
+    @_locked
     def remove(self, q):
         self._queues.remove(q)
 
-    @_locked()
+    @_locked
     def send(self, msg):
         for q in self._queues:
             try:
@@ -114,6 +114,7 @@ class Sender(object):
     - :meth:`.Bot.sendContact`
     - :meth:`.Bot.sendGame`
     - :meth:`.Bot.sendChatAction`
+    - :meth:`.Bot.sendAnimation`
     """
 
     def __init__(self, bot, chat_id):
@@ -131,7 +132,8 @@ class Sender(object):
                        'sendVenue',
                        'sendContact',
                        'sendGame',
-                       'sendChatAction', ]:
+                       'sendChatAction',
+                       'sendAnimation']:
             setattr(self, method, partial(getattr(bot, method), chat_id))
             # Essentially doing:
             #   self.sendMessage = partial(bot.sendMessage, chat_id)
@@ -203,6 +205,7 @@ class Editor(object):
     - :meth:`.Bot.editMessageText`
     - :meth:`.Bot.editMessageCaption`
     - :meth:`.Bot.editMessageReplyMarkup`
+    - :meth:`.Bot. editMessageMedia`
     - :meth:`.Bot.deleteMessage`
     - :meth:`.Bot.editMessageLiveLocation`
     - :meth:`.Bot.stopMessageLiveLocation`
@@ -222,6 +225,7 @@ class Editor(object):
 
         for method in ['editMessageText',
                        'editMessageCaption',
+                       'editMessageMedia',
                        'editMessageReplyMarkup',
                        'deleteMessage',
                        'editMessageLiveLocation',
@@ -544,7 +548,8 @@ class CallbackQueryCoordinator(object):
                         'sendContact',
                         'sendGame',
                         'sendInvoice',
-                        'sendChatAction', ]
+                        'sendChatAction',
+                        'sendAnimation']
 
         for method in send_methods:
             setattr(proxy, method, self.augment_send(getattr(bot, method)))
@@ -593,15 +598,15 @@ class SafeDict(dict):
 
         return k
 
-    @_locked()
+    @_locked
     def __getitem__(self, key):
         return super(SafeDict, self).__getitem__(key)
 
-    @_locked()
+    @_locked
     def __setitem__(self, key, value):
         return super(SafeDict, self).__setitem__(key, value)
 
-    @_locked()
+    @_locked
     def __delitem__(self, key):
         return super(SafeDict, self).__delitem__(key)
 
@@ -1070,6 +1075,7 @@ class DefaultRouterMixin(object):
                                        'chosen_inline_result': lambda msg: self.on_chosen_inline_result(msg),
                                        'shipping_query': lambda msg: self.on_shipping_query(msg),
                                        'pre_checkout_query': lambda msg: self.on_pre_checkout_query(msg),
+                                       'all_passport_data': lambda msg: self.on_passport_data(msg),
                                        '_idle': lambda event: self.on__idle(event)})
         # use lambda to delay evaluation of self.on_ZZZ to runtime because
         # I don't want to require defining all methods right here.

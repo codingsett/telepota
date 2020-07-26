@@ -90,16 +90,7 @@ def _dictify3(data):
         raise ValueError()
 
 
-def _dictify27(data):
-    if type(data) in [str, unicode]:
-        return json.loads(data)
-    elif type(data) is dict:
-        return data
-    else:
-        raise ValueError()
-
-
-_dictify = _dictify3 if sys.version_info >= (3,) else _dictify27
+_dictify = _dictify3
 
 
 def _extract_message(update):
@@ -309,7 +300,7 @@ class OrderedWebhook(RunForeverAsThread):
         :param data:
             One of these:
 
-            - ``str``, ``unicode`` (Python 2.7), or ``bytes`` (Python 3, decoded using UTF-8)
+            - ``str``,  ``bytes`` (Python 3, decoded using UTF-8)
               representing a JSON-serialized `Update <https://core.telegram.org/bots/api#update>`_ object.
             - a ``dict`` representing an Update object.
         """

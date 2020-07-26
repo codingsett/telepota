@@ -532,10 +532,10 @@ Message = _create_class('Message', [
     _Field('new_chat_members', constructor=UserArray),
     'caption',
     _Field('contact', constructor=Contact),
-    _Field('dice', constructor=Dice),
+    # _Field('dice', constructor=Dice),
     _Field('location', constructor=Location),
     _Field('venue', constructor=Venue),
-    _Field('poll', constructor=Poll),
+    # _Field('poll', constructor=Poll),
     _Field('new_chat_member', constructor=User),
     _Field('left_chat_member', constructor=User),
     'new_chat_title',
@@ -594,8 +594,8 @@ Update = _create_class('Update', [
     _Field('callback_query', constructor=CallbackQuery),
     _Field('shipping_query', constructor=ShippingQuery),
     _Field('pre_checkout_query', constructor=PreCheckoutQuery),
-    _Field('poll', constructor=Poll),
-    _Field('poll_answer', constructor=PollAnswer),
+    # _Field('poll', constructor=Poll),
+    # _Field('poll_answer', constructor=PollAnswer),
 ])
 
 

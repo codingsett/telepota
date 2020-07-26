@@ -33,11 +33,15 @@ def flavor(msg):
     - ``chosen_inline_result``
     - ``shipping_query``
     - ``pre_checkout_query``
+    - ``passport_data``
+    - ``poll``
 
     An event's flavor is determined by the single top-level key.
     """
-    if 'message_id' in msg:
+    if 'message_id' in msg and 'passport_data' not in msg:
         return 'chat'
+    elif 'message_id' in msg and 'passport_data' in msg:
+        return 'all_passport_data'
     elif 'id' in msg and 'chat_instance' in msg:
         return 'callback_query'
     elif 'id' in msg and 'query' in msg:
@@ -72,7 +76,7 @@ all_content_types = [
     'contact', 'location', 'venue', 'new_chat_member', 'left_chat_member', 'new_chat_title',
     'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message',
-    'new_chat_members', 'invoice', 'successful_payment'
+    'new_chat_members', 'invoice', 'successful_payment', 'animation', 'passport_data'
 ]
 
 
@@ -91,7 +95,7 @@ def glance(msg, flavor='chat', long=False):
     ``video_note``, ``contact``, ``location``, ``venue``, ``new_chat_member``, ``left_chat_member``, ``new_chat_title``,
     ``new_chat_photo``, ``delete_chat_photo``, ``group_chat_created``, ``supergroup_chat_created``,
     ``channel_chat_created``, ``migrate_to_chat_id``, ``migrate_from_chat_id``, ``pinned_message``,
-    ``new_chat_members``, ``invoice``, ``successful_payment``.
+    ``new_chat_members``, ``invoice``, ``successful_payment``, ``animation``, ``passport_data``.
 
     When ``flavor`` is ``callback_query``
     (``msg`` being a `CallbackQuery <https://core.telegram.org/bots/api#callbackquery>`_ object):
@@ -119,6 +123,11 @@ def glance(msg, flavor='chat', long=False):
 
     - short: (``msg['id']``, ``msg['from']['id']``, ``msg['invoice_payload']``)
     - long: (``msg['id']``, ``msg['from']['id']``, ``msg['invoice_payload']``, ``msg['currency']``, ``msg['total_amount']``)
+
+    When ``flavor`` is ``all_passport_data``
+    (``msg`` being a `PassportData <https://core.telegram.org/bots/api#passportdata>`_ object):
+
+    - regardless: (``msg['chat']['id']``, ``msg['passport_data']``)
     """
 
     def gl_chat():
@@ -138,6 +147,9 @@ def glance(msg, flavor='chat', long=False):
         else:
             return msg['id'], msg['from']['id'], msg['query']
 
+    def gl_all_passport_data():
+        return msg['chat']['id'], msg['passport_data']
+
     def gl_chosen_inline_result():
         return msg['result_id'], msg['from']['id'], msg['query']
 
@@ -154,6 +166,7 @@ def glance(msg, flavor='chat', long=False):
         fn = {'chat': gl_chat,
               'callback_query': gl_callback_query,
               'inline_query': gl_inline_query,
+              'all_passport_data': gl_all_passport_data,
               'chosen_inline_result': gl_chosen_inline_result,
               'shipping_query': gl_shipping_query,
               'pre_checkout_query': gl_pre_checkout_query}[flavor]
@@ -297,9 +310,8 @@ def _split_input_media_array(media_array):
     return (legal_media, files_to_attach)
 
 
-PY_3 = sys.version_info.major >= 3
-_string_type = str if PY_3 else basestring
-_file_type = io.IOBase if PY_3 else file
+_string_type = str
+_file_type = io.IOBase
 
 
 def _isstring(s):
@@ -332,8 +344,9 @@ def _rectify(params):
 
     # Update markdown to use markdownV2(enhanced version of previous markdown) without need of
     # specifying it in parse_mode
-    params.update({'parse_mode': 'MarkdownV2' if str(params['parse_mode']).lower() == 'markdown'
-                                 else params['parse_mode']})
+    if params.get('parse_mode', None):
+        if params['parse_mode'].lower() == 'markdown':
+            params.update({'parse_mode': "MarkdownV2"})
 
     def make_jsonable(value):
         if isinstance(value, list):
@@ -488,7 +501,8 @@ class Bot(_BotBase):
         self._router = helper.Router(flavor, {'chat': lambda msg: self.on_chat_message(msg),
                                               'callback_query': lambda msg: self.on_callback_query(msg),
                                               'inline_query': lambda msg: self.on_inline_query(msg),
-                                              'chosen_inline_result': lambda msg: self.on_chosen_inline_result(msg)})
+                                              'chosen_inline_result': lambda msg: self.on_chosen_inline_result(msg),
+                                              'all_passport_data': lambda msg: self.on_passport_data(msg)})
         # use lambda to delay evaluation of self.on_ZZZ to runtime because
         # I don't want to require defining all methods right here.
 
@@ -548,8 +562,7 @@ class Bot(_BotBase):
             - string: HTTP URL of a photo from the Internet
             - file-like object: obtained by ``open(path, 'rb')``
             - tuple: (filename, file-like object). If the filename contains
-              non-ASCII characters and you are using Python 2.7, make sure the
-              filename is a unicode string.
+              non-ASCII characters.
         """
         p = _strip(locals(), more=['photo'])
         return self._api_request_with_file('sendPhoto', _rectify(p), 'photo', photo)
@@ -689,6 +702,7 @@ class Bot(_BotBase):
 
         :param msg_identifier: Same as in :meth:`.Bot.editMessageText`
         :param media: Same as in :meth:`.Bot.sendMedia`
+        :param inline_message_id: self explanatory`
         """
         p = _strip(locals(), more=['msg_identifier', 'media'])
         legal_media, files_to_attach = _split_input_media_array(media)
@@ -1100,26 +1114,32 @@ class Bot(_BotBase):
     def download_file(self, file_id, dest):
         """
         Download a file to local disk.
-
+        :param file_id: ``file_id`` from telegram
         :param dest: a path or a ``file`` object
+
+        :return file bytes if destination path exists otherwise does not return anything
         """
         f = self.getFile(file_id)
         try:
-            d = dest if _isfile(dest) else open(dest, 'wb')
+            d = dest if _isfile(dest) else open(dest, 'wb') if dest else None
 
-            r = api.download((self._token, f['file_path']), preload_content=False)
+            r = api.download((self._token, f['file_path']), dest, preload_content=False)
 
-            while 1:
-                data = r.read(self._file_chunk_size)
-                if not data:
-                    break
-                d.write(data)
+            if type(r) == bytes:
+                return r
+            else:
+                while 1:
+                    data = r.read(self._file_chunk_size)
+                    if not data:
+                        break
+                    d.write(data)
         finally:
-            if not _isfile(dest) and 'd' in locals():
-                d.close()
+            if dest:
+                if not _isfile(dest) and 'd' in locals():
+                    d.close()
 
-            if 'r' in locals():
-                r.release_conn()
+                if 'r' in locals():
+                    r.release_conn()
 
     def message_loop(self, callback=None, relax=0.1,
                      timeout=20, allowed_updates=None,
@@ -1145,14 +1165,13 @@ class Bot(_BotBase):
         :param source:
             Source of updates.
             If ``None``, ``getUpdates`` is used to obtain new messages from Telegram servers.
-            If it is a synchronized queue (``Queue.Queue`` in Python 2.7 or
-            ``queue.Queue`` in Python 3), new messages are pulled from the queue.
+            If it is a synchronized queue (``queue.Queue`` in Python 3), new messages are pulled from the queue.
             A web application implementing a webhook can dump updates into the queue,
             while the bot pulls from it. This is how telepot can be integrated with webhooks.
 
         Acceptable contents in queue:
 
-        - ``str``, ``unicode`` (Python 2.7), or ``bytes`` (Python 3, decoded using UTF-8)
+        - ``str``, ``bytes`` (Python 3, decoded using UTF-8)
           representing a JSON-serialized `Update <https://core.telegram.org/bots/api#update>`_ object.
         - a ``dict`` representing an Update object.
 
@@ -1220,6 +1239,7 @@ class Bot(_BotBase):
                                            'channel_post',
                                            'edited_channel_post',
                                            'callback_query',
+                                           'passport_data',
                                            'inline_query',
                                            'chosen_inline_result',
                                            'shipping_query',
@@ -1265,16 +1285,8 @@ class Bot(_BotBase):
             else:
                 raise ValueError()
 
-        def dictify27(data):
-            if type(data) in [str, unicode]:
-                return json.loads(data)
-            elif type(data) is dict:
-                return data
-            else:
-                raise ValueError()
-
         def get_from_queue_unordered(qu):
-            dictify = dictify3 if sys.version_info >= (3,) else dictify27
+            dictify = dictify3
             while 1:
                 try:
                     data = qu.get(block=True)
@@ -1284,7 +1296,7 @@ class Bot(_BotBase):
                     traceback.print_exc()
 
         def get_from_queue(qu):
-            dictify = dictify3 if sys.version_info >= (3,) else dictify27
+            dictify = dictify3
 
             # Here is the re-ordering mechanism, ensuring in-order delivery of updates.
             max_id = None  # max update_id passed to callback
