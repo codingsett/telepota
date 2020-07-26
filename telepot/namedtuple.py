@@ -345,10 +345,18 @@ ForceReply = _create_class('ForceReply', [
     'selective',
 ])
 
+LoginUrl = _create_class('ForceReply', [
+    'url',
+    'forward_text',
+    'bot_username',
+    'request_write_access'
+])
+
 # outgoing
 InlineKeyboardButton = _create_class('InlineKeyboardButton', [
     'text',
     'url',
+    _Field('login_url', constructor=LoginUrl),
     'callback_data',
     'switch_inline_query',
     'switch_inline_query_current_chat',
@@ -620,6 +628,7 @@ CallbackQuery = _create_class('CallbackQuery', [
 Update = _create_class('Update', [
     'update_id',
     _Field('message', constructor=Message),
+    _Field('edited_message', constructor=Message),
     _Field('edited_message', constructor=Message),
     _Field('channel_post', constructor=Message),
     _Field('edited_channel_post', constructor=Message),
