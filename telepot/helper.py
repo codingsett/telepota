@@ -115,6 +115,7 @@ class Sender(object):
     - :meth:`.Bot.sendGame`
     - :meth:`.Bot.sendChatAction`
     - :meth:`.Bot.sendAnimation`
+    - :meth:`.Bot.sendPoll`
     """
 
     def __init__(self, bot, chat_id):
@@ -133,7 +134,8 @@ class Sender(object):
                        'sendContact',
                        'sendGame',
                        'sendChatAction',
-                       'sendAnimation']:
+                       'sendAnimation',
+                       'sendPoll']:
             setattr(self, method, partial(getattr(bot, method), chat_id))
             # Essentially doing:
             #   self.sendMessage = partial(bot.sendMessage, chat_id)
@@ -203,6 +205,7 @@ class Editor(object):
     to supply the aforementioned** ``msg_identifier``:
 
     - :meth:`.Bot.editMessageText`
+    - :meth:`.Bot.stopPoll`
     - :meth:`.Bot.editMessageCaption`
     - :meth:`.Bot.editMessageReplyMarkup`
     - :meth:`.Bot. editMessageMedia`
@@ -224,6 +227,7 @@ class Editor(object):
             msg_identifier = message_identifier(msg_identifier)
 
         for method in ['editMessageText',
+                       'stopPoll',
                        'editMessageCaption',
                        'editMessageMedia',
                        'editMessageReplyMarkup',
@@ -549,7 +553,8 @@ class CallbackQueryCoordinator(object):
                         'sendGame',
                         'sendInvoice',
                         'sendChatAction',
-                        'sendAnimation']
+                        'sendAnimation',
+                        'sendPoll']
 
         for method in send_methods:
             setattr(proxy, method, self.augment_send(getattr(bot, method)))

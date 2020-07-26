@@ -986,6 +986,26 @@ class Bot(_BotBase):
         p.update(_dismantle_message_identifier(msg_identifier))
         return self._api_request('deleteMessage', _rectify(p))
 
+    def sendPoll(self, chat_id, question, options, is_anonymous=None, type=None, allows_multiple_answers=None,
+                    correct_option_id=None, explanation=None, explanation_parse_mode=None, open_period=None,
+                    close_date=None, is_closed=None,
+                    disable_notification=None,
+                    reply_to_message_id=None,
+                    reply_markup=None):
+        """ See: https://core.telegram.org/bots/api#sendpoll """
+        p = _strip(locals())
+        return self._api_request('sendPoll', _rectify(p))
+
+    def stopPoll(self, msg_identifier, reply_markup=None):
+        """
+        See: https://core.telegram.org/bots/api#stoppoll
+
+        :param msg_identifier: Same as ``msg_identifier`` in :meth:`telepot.Bot.editMessageText`
+        """
+        p = _strip(locals(), more=['msg_identifier'])
+        p.update(_dismantle_message_identifier(msg_identifier))
+        return self._api_request('stopPoll', _rectify(p))
+
     def sendSticker(self, chat_id, sticker,
                     disable_notification=None,
                     reply_to_message_id=None,

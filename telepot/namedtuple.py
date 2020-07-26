@@ -296,6 +296,7 @@ UserProfilePhotos = _create_class('UserProfilePhotos', [
 ChatMember = _create_class('ChatMember', [
     _Field('user', constructor=User),
     'status',
+    'is_member',
     'until_date',
     'can_be_edited',
     'can_change_info',
@@ -382,6 +383,37 @@ GameHighScore = _create_class('GameHighScore', [
     _Field('user', constructor=User),
     'score',
 ])
+
+
+PollOption = _create_class('PollOption', [
+    'text',
+    'voter_count'
+])
+
+PollAnswer = _create_class('PollAnswer', [
+    'poll_id',
+    _Field('user', constructor=User),
+    'option_ids'
+])
+
+# outgoing
+Poll = _create_class('Poll', [
+    'id',
+    'question',
+    _Field('options', constructor=PollOption),
+    'total_voter_count',
+    'is_closed',
+    'is_anonymous',
+    'type',
+    'allows_multiple_answers',
+    'correct_option_id',
+    'explanation',
+    _Field('explanation_entities', constructor=MessageEntity),
+    'open_period',
+    'close_date',
+])
+
+
 
 # incoming
 Animation = _create_class('Animation', [
@@ -512,6 +544,7 @@ Message = _create_class('Message', [
     _Field('forward_from', constructor=User),
     _Field('forward_from_chat', constructor=Chat),
     'forward_from_message_id',
+    'forward_sender_name',
     'forward_signature',
     'forward_date',
     _Field('reply_to_message', constructor=_Message),
@@ -535,7 +568,7 @@ Message = _create_class('Message', [
     # _Field('dice', constructor=Dice),
     _Field('location', constructor=Location),
     _Field('venue', constructor=Venue),
-    # _Field('poll', constructor=Poll),
+    _Field('poll', constructor=Poll),
     _Field('new_chat_member', constructor=User),
     _Field('left_chat_member', constructor=User),
     'new_chat_title',
@@ -594,8 +627,8 @@ Update = _create_class('Update', [
     _Field('callback_query', constructor=CallbackQuery),
     _Field('shipping_query', constructor=ShippingQuery),
     _Field('pre_checkout_query', constructor=PreCheckoutQuery),
-    # _Field('poll', constructor=Poll),
-    # _Field('poll_answer', constructor=PollAnswer),
+    _Field('poll', constructor=Poll),
+    _Field('poll_answer', constructor=PollAnswer),
 ])
 
 
