@@ -858,6 +858,11 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('exportChatInviteLink', _rectify(p))
 
+    def setChatAdministratorCustomTitle(self, chat_id, user_id, custom_title):
+        """ See: https://core.telegram.org/bots/api#setchatadministratorcustomtitle """
+        p = _strip(locals())
+        return self._api_request('setChatAdministratorCustomTitle', _rectify(p))
+
     def setChatPermissions(self, chat_id):
         """ See: https://core.telegram.org/bots/api#setchatpermissions """
         p = _strip(locals())

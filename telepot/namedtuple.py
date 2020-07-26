@@ -149,6 +149,7 @@ Chat = _create_class('Chat', [
     _Field('photo', constructor=ChatPhoto),
     'description',
     'invite_link',
+    'slow_mode_delay',
     _Field('pinned_message', constructor=_Message),
     'sticker_set_name',
     'can_set_sticker_set',
@@ -159,6 +160,7 @@ PhotoSize = _create_class('PhotoSize', [
     'file_id',
     'width',
     'height',
+    'file_unique_id',
     'file_size',
     'file_path',  # undocumented
 ])
@@ -179,6 +181,7 @@ Audio = _create_class('Audio', [
 Document = _create_class('Document', [
     'file_id',
     _Field('thumb', constructor=PhotoSize),
+    'file_unique_id',
     'file_name',
     'mime_type',
     'file_size',
@@ -199,6 +202,7 @@ Sticker = _create_class('Sticker', [
     'width',
     'height',
     'is_animated',
+    'file_unique_id',
     _Field('thumb', constructor=PhotoSize),
     'emoji',
     'set_name',
@@ -242,6 +246,7 @@ Video = _create_class('Video', [
     'duration',
     _Field('thumb', constructor=PhotoSize),
     'mime_type',
+    'file_unique_id',
     'file_size',
     'file_path',  # undocumented
 ])
@@ -251,7 +256,8 @@ Voice = _create_class('Voice', [
     'file_id',
     'duration',
     'mime_type',
-    'file_size'
+    'file_size',
+    'file_unique_id'
 ])
 
 # incoming
@@ -260,7 +266,8 @@ VideoNote = _create_class('VideoNote', [
     'length',
     'duration',
     _Field('thumb', constructor=PhotoSize),
-    'file_size'
+    'file_size',
+    'file_unique_id'
 ])
 
 # incoming
@@ -291,7 +298,8 @@ Venue = _create_class('Venue', [
 File = _create_class('File', [
     'file_id',
     'file_size',
-    'file_path'
+    'file_path',
+    'file_unique_id'
 ])
 
 
