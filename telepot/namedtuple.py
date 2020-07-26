@@ -584,6 +584,7 @@ Message = _create_class('Message', [
     _Field('successful_payment', constructor=SuccessfulPayment),
     'connected_website',
     _Field('passport_data', constructor=PassportData),
+    'reply_markup'
 ])
 
 # incoming

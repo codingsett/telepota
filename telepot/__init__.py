@@ -38,12 +38,15 @@ def flavor(msg):
 
     An event's flavor is determined by the single top-level key.
     """
+    our_list = ['poll_id', 'question', 'option_ids']
     if 'message_id' in msg and 'passport_data' not in msg:
         return 'chat'
     elif 'message_id' in msg and 'passport_data' in msg:
         return 'all_passport_data'
     elif 'id' in msg and 'chat_instance' in msg:
         return 'callback_query'
+    elif set(our_list).intersection(msg):
+        return 'poll_data'
     elif 'id' in msg and 'query' in msg:
         return 'inline_query'
     elif 'result_id' in msg:
@@ -76,7 +79,8 @@ all_content_types = [
     'contact', 'location', 'venue', 'new_chat_member', 'left_chat_member', 'new_chat_title',
     'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message',
-    'new_chat_members', 'invoice', 'successful_payment', 'animation', 'passport_data'
+    'new_chat_members', 'invoice', 'successful_payment', 'animation', 'passport_data',
+    'poll_data'
 ]
 
 
@@ -95,7 +99,7 @@ def glance(msg, flavor='chat', long=False):
     ``video_note``, ``contact``, ``location``, ``venue``, ``new_chat_member``, ``left_chat_member``, ``new_chat_title``,
     ``new_chat_photo``, ``delete_chat_photo``, ``group_chat_created``, ``supergroup_chat_created``,
     ``channel_chat_created``, ``migrate_to_chat_id``, ``migrate_from_chat_id``, ``pinned_message``,
-    ``new_chat_members``, ``invoice``, ``successful_payment``, ``animation``, ``passport_data``.
+    ``new_chat_members``, ``invoice``, ``successful_payment``, ``animation``, ``passport_data``, ``poll_data``.
 
     When ``flavor`` is ``callback_query``
     (``msg`` being a `CallbackQuery <https://core.telegram.org/bots/api#callbackquery>`_ object):
@@ -127,7 +131,11 @@ def glance(msg, flavor='chat', long=False):
     When ``flavor`` is ``all_passport_data``
     (``msg`` being a `PassportData <https://core.telegram.org/bots/api#passportdata>`_ object):
 
-    - regardless: (``msg['chat']['id']``, ``msg['passport_data']``)
+    When ``flavor`` is ``poll_data``
+    (``msg`` being a `Poll <https://core.telegram.org/bots/api#sendPoll>`_ object):
+
+    - Anonymous Polls: (``msg['poll_id']``, ``msg['option_ids'], ``msg['user']['id']``)
+    - Unanonymours Polls: ( ``msg['id']``, ``other_data`` )
     """
 
     def gl_chat():
@@ -150,6 +158,14 @@ def glance(msg, flavor='chat', long=False):
     def gl_all_passport_data():
         return msg['chat']['id'], msg['passport_data']
 
+    def gl_poll_data():
+        if 'poll_id' in msg:
+            return msg['poll_id'], msg['option_ids'], msg['user']['id']
+        else:
+            other_data = msg.copy()
+            other_data.pop('id')
+            return msg['id'], other_data, None
+
     def gl_chosen_inline_result():
         return msg['result_id'], msg['from']['id'], msg['query']
 
@@ -169,10 +185,11 @@ def glance(msg, flavor='chat', long=False):
               'all_passport_data': gl_all_passport_data,
               'chosen_inline_result': gl_chosen_inline_result,
               'shipping_query': gl_shipping_query,
+              'poll_data': gl_poll_data,
               'pre_checkout_query': gl_pre_checkout_query}[flavor]
+
     except KeyError:
         raise exception.BadFlavor(flavor)
-
     return fn()
 
 
@@ -502,7 +519,8 @@ class Bot(_BotBase):
                                               'callback_query': lambda msg: self.on_callback_query(msg),
                                               'inline_query': lambda msg: self.on_inline_query(msg),
                                               'chosen_inline_result': lambda msg: self.on_chosen_inline_result(msg),
-                                              'all_passport_data': lambda msg: self.on_passport_data(msg)})
+                                              'all_passport_data': lambda msg: self.on_passport_data(msg),
+                                              'poll_data': lambda msg: self.on_poll_data(msg)})
         # use lambda to delay evaluation of self.on_ZZZ to runtime because
         # I don't want to require defining all methods right here.
 
@@ -1263,7 +1281,9 @@ class Bot(_BotBase):
                                            'inline_query',
                                            'chosen_inline_result',
                                            'shipping_query',
-                                           'pre_checkout_query'])
+                                           'pre_checkout_query',
+                                           'poll',
+                                           'poll_answer'])
             collect_queue.put(update[key])
             return update['update_id']
 
