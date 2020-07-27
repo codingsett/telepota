@@ -1,5 +1,10 @@
 # telepot changelog
 
+## 12.8 (2020-07-27)
+
+- Bot API 3.6 to 4.9
+- added utils helper functions to help with decrypting passport data.
+
 ## 12.7 (2018-05-27)
 
 - Await `aiohttp.ClientSession.close()`
