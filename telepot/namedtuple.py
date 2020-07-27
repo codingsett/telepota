@@ -589,7 +589,6 @@ Dice = _create_class('Dice', [
     'value',
 ])
 
-
 # incoming
 Message = _create_class('Message', [
     'message_id',
