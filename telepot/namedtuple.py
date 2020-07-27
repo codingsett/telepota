@@ -592,7 +592,7 @@ Dice = _create_class('Dice', [
 # incoming
 Message = _create_class('Message', [
     'message_id',
-    _Field('from', constructor=User),
+    _Field('from_', constructor=User),
     _Field('via_bot', constructor=User),
     'date',
     _Field('chat', constructor=Chat),
