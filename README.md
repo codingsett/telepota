@@ -151,7 +151,7 @@ _For more examples, please refer to the [Examples Folder](https://github.com/cod
 
 <!-- COMPARISON TABLE -->
 
-## Comparison Table
+## Comparison
 
 The following comparison of different libraries is purely subjective after using them for a while.
 
