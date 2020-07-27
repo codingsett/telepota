@@ -1,7 +1,8 @@
 *.pyc
 .idea/
-telepot.egg-info/
+telepota.egg-info/
 dist/
+build/
 experiments/
 doc/_build/
 todo.txt
