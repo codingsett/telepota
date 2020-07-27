@@ -15,7 +15,7 @@ Common and straight-forward features are too trivial to worth listing.
 Please check the telepot reference to know what this libray does in depth.
 For more unique and novel features, I cannot find standard terms to describe them.
 The best way to experience telepot is by reading this page and going through the
-`examples <https://github.com/nickoala/telepot/tree/master/examples>`_. Let's go.
+`examples <https://github.com/codingsett/telepota/tree/master/examples>`_. Let's go.
 
 .. contents::
     :local:
@@ -374,5 +374,5 @@ below in async style:
 .. literalinclude:: _code/countera.py
    :emphasize-lines: 4-5,7,12-14,24
 
-`More Examples » <https://github.com/nickoala/telepot/tree/master/examples>`_
+`More Examples » <https://github.com/codingsett/telepota/tree/master/examples>`_
 -----------------------------------------------------------------------------

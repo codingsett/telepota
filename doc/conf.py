@@ -18,10 +18,10 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = u'telepot'
+project = u'telepota'
 year = datetime.now().year
-copyright = u'%d, Nick Lee' % year
-author = u'Nick Lee'
+copyright = u'%d, Joseph Kuria' % year
+author = u'Joseph Kuria'
 
 
 from telepot import __version__
@@ -40,8 +40,8 @@ html_theme_options = {
     'description': 'Python framework for Telegram Bot API',
     'show_powered_by': False,
     'fixed_sidebar': True,
-    'github_user': 'nickoala',
-    'github_repo': 'telepot',
+    'github_user': 'codingsett',
+    'github_repo': 'telepota',
     'github_type': 'star',
 }
 html_static_path = ['_static']
@@ -123,7 +123,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'telepot.tex', u'telepot Documentation',
-     u'Nick Lee', 'manual'),
+     u'Joseph Kuria', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
