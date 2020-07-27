@@ -148,6 +148,20 @@ while 1:
 
 _For more examples, please refer to the [Examples Folder](https://github.com/codingsett/telepota/tree/master/examples)_
 
+<!-- COMPARISON TABLE -->
+
+## Comparison
+
+The following comparison of different libraries is purely subjective after using them for a while.
+
+➖ means am not sure whats going on there because i dont have adequate information.
+
+| Framework           	| Async 	| Sync 	| Runtime    	| Documentation 	| community 	| active 	| beginner-friendly 	|
+|---------------------	|-------	|------	|------------	|---------------	|-----------	|--------	|-------------------	|
+| telepota            	| ✅     	| ✅    	| Python3+   	| ✅             	| small     	| ✅      	| ✅                 	|
+| python-telegram-bot 	| ❌     	| ✅    	| Python3+   	| ✅             	| large     	| ✅      	| ❌                 	|
+| pyTelegramBotAPI    	| ❌     	| ✅    	| Python3+   	| ➖             	| medium    	| ➖      	| ✅                 	|
+| aiogram             	| ✅     	| ❌    	| python3.7+ 	| ✅             	| medium    	| ✅      	| ✅                 	|
 
 <!-- ROADMAP -->
 ## Roadmap
