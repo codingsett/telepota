@@ -263,7 +263,7 @@ def send_everything_on_contact(msg):
     ##### sendMediaGroup
 
     with open('TestFiles/lighthouse.jpg', 'rb') as f1, open('TestFiles/gandhi.png', 'rb') as f2, open('TestFiles/bookshelf.jpg', 'rb') as f3, open(
-            'saturn.jpg', 'rb') as f4:
+            'TestFiles/saturn.jpg', 'rb') as f4:
         ms = [
             telepot.namedtuple.InputMediaPhoto(media=f1),
             telepot.namedtuple.InputMediaPhoto(media=('media2', f2)),
