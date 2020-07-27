@@ -676,7 +676,6 @@ Update = _create_class('Update', [
     'update_id',
     _Field('message', constructor=Message),
     _Field('edited_message', constructor=Message),
-    _Field('edited_message', constructor=Message),
     _Field('channel_post', constructor=Message),
     _Field('edited_channel_post', constructor=Message),
     _Field('inline_query', constructor=InlineQuery),

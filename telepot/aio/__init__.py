@@ -80,18 +80,16 @@ class Bot(_BotBase):
     async def _api_request(self, method, params=None, files=None, **kwargs):
         return await api.request((self._token, method, params, files), **kwargs)
 
-    async def _api_request_with_file(self, method, params, file_key, file_value, **kwargs):
+    async def _api_request_with_file(self, method, params, file_key, file_value, extra_files=None, **kwargs):
         if _isstring(file_value):
-            if 'extra_files' in kwargs:
-                params[kwargs['extra_files'][0]] = kwargs['extra_files'][1]
-                kwargs.pop('extra_fields')
+            if extra_files:
+                params[extra_files[0]] = kwargs[extra_files[1]]
             params[file_key] = file_value
             return await self._api_request(method, _rectify(params), **kwargs)
         else:
             files = {file_key: file_value}
-            if 'extra_files' in kwargs:
-                files.update({kwargs['extra_files'][0] :kwargs['extra_files'][1]})
-                kwargs.pop('extra_fields')
+            if extra_files:
+                files.update({kwargs['extra_files'][0]: kwargs['extra_files'][1]})
             return await self._api_request(method, _rectify(params), files, **kwargs)
 
     async def getMe(self):
