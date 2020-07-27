@@ -116,6 +116,7 @@ class Sender(object):
     - :meth:`.Bot.sendChatAction`
     - :meth:`.Bot.sendAnimation`
     - :meth:`.Bot.sendPoll`
+    - :meth:`.Bot.sendDice`
     """
 
     def __init__(self, bot, chat_id):
@@ -135,7 +136,8 @@ class Sender(object):
                        'sendGame',
                        'sendChatAction',
                        'sendAnimation',
-                       'sendPoll']:
+                       'sendPoll',
+                       'sendDice']:
             setattr(self, method, partial(getattr(bot, method), chat_id))
             # Essentially doing:
             #   self.sendMessage = partial(bot.sendMessage, chat_id)
@@ -170,6 +172,8 @@ class Administrator(object):
     - :meth:`.Bot.getChatMember`
     - :meth:`.Bot.setChatStickerSet`
     - :meth:`.Bot.deleteChatStickerSet`
+    - :meth:`.Bot.setChatAdministratorCustomTitle`
+    - :meth:`.Bot.setChatPermissions`
     """
 
     def __init__(self, bot, chat_id):
@@ -190,7 +194,10 @@ class Administrator(object):
                        'getChatMembersCount',
                        'getChatMember',
                        'setChatStickerSet',
-                       'deleteChatStickerSet']:
+                       'deleteChatStickerSet',
+                       'setChatAdministratorCustomTitle',
+                        'setChatPermissions'
+                       ]:
             setattr(self, method, partial(getattr(bot, method), chat_id))
 
 
@@ -554,7 +561,8 @@ class CallbackQueryCoordinator(object):
                         'sendInvoice',
                         'sendChatAction',
                         'sendAnimation',
-                        'sendPoll']
+                        'sendPoll',
+                        'sendDice']
 
         for method in send_methods:
             setattr(proxy, method, self.augment_send(getattr(bot, method)))

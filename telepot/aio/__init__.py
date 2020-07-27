@@ -57,7 +57,10 @@ class Bot(_BotBase):
         self._router = helper.Router(flavor, {'chat': helper._create_invoker(self, 'on_chat_message'),
                                               'callback_query': helper._create_invoker(self, 'on_callback_query'),
                                               'inline_query': helper._create_invoker(self, 'on_inline_query'),
-                                              'chosen_inline_result': helper._create_invoker(self, 'on_chosen_inline_result')})
+                                              'chosen_inline_result': helper._create_invoker(self, 'on_chosen_inline_result'),
+                                              'all_passport_data': helper._create_invoker(self, 'on_passport_data'),
+                                              'poll_data': helper._create_invoker(self, 'on_poll_data')
+                                              })
 
     @property
     def loop(self):
@@ -79,10 +82,16 @@ class Bot(_BotBase):
 
     async def _api_request_with_file(self, method, params, file_key, file_value, **kwargs):
         if _isstring(file_value):
+            if 'extra_files' in kwargs:
+                params[kwargs['extra_files'][0]] = kwargs['extra_files'][1]
+                kwargs.pop('extra_fields')
             params[file_key] = file_value
             return await self._api_request(method, _rectify(params), **kwargs)
         else:
             files = {file_key: file_value}
+            if 'extra_files' in kwargs:
+                files.update({kwargs['extra_files'][0] :kwargs['extra_files'][1]})
+                kwargs.pop('extra_fields')
             return await self._api_request(method, _rectify(params), files, **kwargs)
 
     async def getMe(self):
@@ -174,6 +183,25 @@ class Bot(_BotBase):
         p = _strip(locals(), more=['video'])
         return await self._api_request_with_file('sendVideo', _rectify(p), 'video', video)
 
+    async def sendAnimation(self, chat_id, animation,
+                            duration=None,
+                            width=None,
+                            height=None,
+                            thumb=None,
+                            caption=None,
+                            parse_mode=None,
+                            disable_notification=None,
+                            reply_to_message_id=None,
+                            reply_markup=None):
+        """
+        See: https://core.telegram.org/bots/api#sendanimation
+
+        :param animation: Same as ``photo`` in :meth:`telepot.aio.Bot.sendPhoto`
+        """
+        p = _strip(locals(), more=['animation', 'thumb' if thumb else ''])
+        return await self._api_request_with_file('sendAnimation', _rectify(p), 'animation', animation,
+                                                 extra_files=['thumb', thumb])
+
     async def sendVoice(self, chat_id, voice,
                         caption=None,
                         parse_mode=None,
@@ -236,6 +264,20 @@ class Bot(_BotBase):
         p['media'] = legal_media
         return await self._api_request('sendMediaGroup', _rectify(p), files_to_attach)
 
+    async def editMessageMedia(self, msg_identifier, media, inline_message_id=None, reply_markup=None):
+        """
+        See: https://core.telegram.org/bots/api#editmessagemedia
+
+        :param msg_identifier: Same as in :meth:`.aio.Bot.editMessageText`
+        :param media: Same as in :meth:`.aio.Bot.sendMedia`
+        :param inline_message_id: self explanatory`
+        """
+        p = _strip(locals(), more=['msg_identifier', 'media'])
+        legal_media, files_to_attach = _split_input_media_array(media)
+        p.update(_dismantle_message_identifier(msg_identifier))
+        p['media'] = legal_media
+        return await self._api_request('editMessageMedia', _rectify(p), files_to_attach)
+
     async def sendLocation(self, chat_id, latitude, longitude,
                            live_period=None,
                            disable_notification=None,
@@ -269,6 +311,7 @@ class Bot(_BotBase):
 
     async def sendVenue(self, chat_id, latitude, longitude, title, address,
                         foursquare_id=None,
+                        foursquare_type=None,
                         disable_notification=None,
                         reply_to_message_id=None,
                         reply_markup=None):
@@ -278,6 +321,7 @@ class Bot(_BotBase):
 
     async def sendContact(self, chat_id, phone_number, first_name,
                           last_name=None,
+                          vcard=None,
                           disable_notification=None,
                           reply_to_message_id=None,
                           reply_markup=None):
@@ -340,12 +384,8 @@ class Bot(_BotBase):
         p = _strip(locals())
         return await self._api_request('unbanChatMember', _rectify(p))
 
-    async def restrictChatMember(self, chat_id, user_id,
-                                 until_date=None,
-                                 can_send_messages=None,
-                                 can_send_media_messages=None,
-                                 can_send_other_messages=None,
-                                 can_add_web_page_previews=None):
+    async def restrictChatMember(self, chat_id, user_id, permissions,
+                           until_date=None):
         """ See: https://core.telegram.org/bots/api#restrictchatmember """
         p = _strip(locals())
         return await self._api_request('restrictChatMember', _rectify(p))
@@ -367,6 +407,26 @@ class Bot(_BotBase):
         """ See: https://core.telegram.org/bots/api#exportchatinvitelink """
         p = _strip(locals())
         return await self._api_request('exportChatInviteLink', _rectify(p))
+
+    async def getMyCommands(self):
+        """ See: https://core.telegram.org/bots/api#getmycommands """
+        p = _strip(locals())
+        return await self._api_request('getMyCommands', _rectify(p))
+
+    async def setMyCommands(self, commands):
+        """ See: https://core.telegram.org/bots/api#setmycommands """
+        p = _strip(locals())
+        return await self._api_request('setMyCommands', _rectify(p))
+
+    async def setChatAdministratorCustomTitle(self, chat_id, user_id, custom_title):
+        """ See: https://core.telegram.org/bots/api#setchatadministratorcustomtitle """
+        p = _strip(locals())
+        return await self._api_request('setChatAdministratorCustomTitle', _rectify(p))
+
+    async def setChatPermissions(self, chat_id):
+        """ See: https://core.telegram.org/bots/api#setchatpermissions """
+        p = _strip(locals())
+        return await self._api_request('setChatPermissions', _rectify(p))
 
     async def setChatPhoto(self, chat_id, photo):
         """ See: https://core.telegram.org/bots/api#setchatphoto """
@@ -536,22 +596,45 @@ class Bot(_BotBase):
         p = _strip(locals(), more=['png_sticker'])
         return await self._api_request_with_file('uploadStickerFile', _rectify(p), 'png_sticker', png_sticker)
 
-    async def createNewStickerSet(self, user_id, name, title, png_sticker, emojis,
+    async def createNewStickerSet(self, user_id, name, title, emojis, png_sticker=None, tgs_sticker=None,
                                   contains_masks=None,
                                   mask_position=None):
         """
         See: https://core.telegram.org/bots/api#createnewstickerset
         """
-        p = _strip(locals(), more=['png_sticker'])
-        return await self._api_request_with_file('createNewStickerSet', _rectify(p), 'png_sticker', png_sticker)
+        if png_sticker:
+            p = _strip(locals(), more=['png_sticker'])
+            return await self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        elif tgs_sticker:
+            p = _strip(locals(), more=['tgs_sticker'])
+            return await self._api_request_with_file('addStickerToSet', _rectify(p), 'tgs_sticker', tgs_sticker)
+        else:
+            raise ValueError('You must use exactly one of the fields png_sticker or tgs_sticker')
 
-    async def addStickerToSet(self, user_id, name, png_sticker, emojis,
+    async def addStickerToSet(self, user_id, name, emojis, png_sticker=None, tgs_sticker=None,
                               mask_position=None):
         """
         See: https://core.telegram.org/bots/api#addstickertoset
         """
-        p = _strip(locals(), more=['png_sticker'])
-        return await self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        if png_sticker:
+            p = _strip(locals(), more=['png_sticker'])
+            return await self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        elif tgs_sticker:
+            p = _strip(locals(), more=['tgs_sticker'])
+            return await self._api_request_with_file('addStickerToSet', _rectify(p), 'tgs_sticker', tgs_sticker)
+        else:
+            raise ValueError('You must use exactly one of the fields png_sticker or tgs_sticker')
+
+    async def setStickerSetThumb(self, name, user_id, thumb=None):
+        """
+        See: https://core.telegram.org/bots/api#setstickersetthumb
+        """
+        if thumb:
+            p = _strip(locals(), more=['thumb'])
+            return await self._api_request_with_file('setStickerSetThumb', _rectify(p), 'thumb', thumb)
+        else:
+            p = _strip(locals())
+            return await self._api_request('setStickerSetThumb', _rectify(p))
 
     async def setStickerPositionInSet(self, sticker, position):
         """
@@ -608,16 +691,29 @@ class Bot(_BotBase):
         """ See: https://core.telegram.org/bots/api#getwebhookinfo """
         return await self._api_request('getWebhookInfo')
 
+    async def setPassportDataErrors(self, chat_id, errors):
+        """ See: https://core.telegram.org/bots/api#setpassportdataerrors """
+        p = _strip(locals())
+        return await self._api_request('setPassportDataErrors', _rectify(p))
+
     async def setGameScore(self, user_id, score, game_message_identifier,
                            force=None,
                            disable_edit_message=None):
-        """ See: https://core.telegram.org/bots/api#setgamescore """
+        """
+        See: https://core.telegram.org/bots/api#setgamescore
+
+        :param game_message_identifier: Same as ``msg_identifier`` in :meth:`telepot.aio.Bot.editMessageText`
+        """
         p = _strip(locals(), more=['game_message_identifier'])
         p.update(_dismantle_message_identifier(game_message_identifier))
         return await self._api_request('setGameScore', _rectify(p))
 
     async def getGameHighScores(self, user_id, game_message_identifier):
-        """ See: https://core.telegram.org/bots/api#getgamehighscores """
+        """
+        See: https://core.telegram.org/bots/api#getgamehighscores
+
+        :param game_message_identifier: Same as ``msg_identifier`` in :meth:`telepot.aio.Bot.editMessageText`
+        """
         p = _strip(locals(), more=['game_message_identifier'])
         p.update(_dismantle_message_identifier(game_message_identifier))
         return await self._api_request('getGameHighScores', _rectify(p))
