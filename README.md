@@ -159,6 +159,19 @@ _For more examples, please refer to the [Examples Folder](https://github.com/cod
 - [ ] Replace urllib with requests maybe.
 - [x] Update telepot to latest BOT API version.
 
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+All contributions are welcome and appreciated. A few guidelines you need to follow before contributing:
+
+1. Document your code(for self documenting code there is no need for unnecessary comments).
+2. Make sure the tests run properly.
+3. Create a pull request.
+
+I will update this guide with more details in order to provide a good base structure.
+
+
 <!-- LICENSE -->
 ## License
 
