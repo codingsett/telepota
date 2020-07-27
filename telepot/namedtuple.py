@@ -592,7 +592,8 @@ Dice = _create_class('Dice', [
 # incoming
 Message = _create_class('Message', [
     'message_id',
-    _Field('from_', constructor=User),
+    _Field('from', constructor=User),
+    _Field('via_bot', constructor=User),
     'date',
     _Field('chat', constructor=Chat),
     _Field('forward_from', constructor=User),
@@ -774,6 +775,7 @@ InlineQueryResultGif = _create_class('InlineQueryResultGif', [
     'gif_height',
     'gif_duration',
     'thumb_url',
+    'thumb_mime_type',
     'title',
     'caption',
     'parse_mode',
@@ -790,6 +792,7 @@ InlineQueryResultMpeg4Gif = _create_class('InlineQueryResultMpeg4Gif', [
     'mpeg4_height',
     'mpeg4_duration',
     'thumb_url',
+    'thumb_mime_type',
     'title',
     'caption',
     'parse_mode',

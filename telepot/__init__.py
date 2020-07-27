@@ -1053,7 +1053,10 @@ class Bot(_BotBase):
                     disable_notification=None,
                     reply_to_message_id=None,
                     reply_markup=None):
-        """ See: https://core.telegram.org/bots/api#senddice """
+        """
+        Choose between different animations (``dice``, ``darts``, ``basketball``) by specifying the ``emoji`` parameter
+        See: https://core.telegram.org/bots/api#senddice
+        """
         p = _strip(locals())
         return self._api_request('sendDice', _rectify(p))
 
