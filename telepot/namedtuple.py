@@ -229,6 +229,12 @@ StickerSet = _create_class('StickerSet', [
 ])
 
 # incoming
+BotCommand = _create_class('BotCommand', [
+    'command',
+    'description'
+])
+
+# incoming
 PassportFile = _create_class('PassportFile', [
     'file_id',
     'file_unique_id',
@@ -578,6 +584,12 @@ PassportData = _create_class('PassportData', [
     _Field('credentials', constructor=EncryptedCredentials),
 ])
 
+Dice = _create_class('Dice', [
+    'emoji',
+    'value',
+])
+
+
 # incoming
 Message = _create_class('Message', [
     'message_id',
@@ -608,7 +620,7 @@ Message = _create_class('Message', [
     _Field('new_chat_members', constructor=UserArray),
     'caption',
     _Field('contact', constructor=Contact),
-    # _Field('dice', constructor=Dice),
+    _Field('dice', constructor=Dice),
     _Field('location', constructor=Location),
     _Field('venue', constructor=Venue),
     _Field('poll', constructor=Poll),

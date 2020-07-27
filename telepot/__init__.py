@@ -540,10 +540,17 @@ class Bot(_BotBase):
 
     def _api_request_with_file(self, method, params, file_key, file_value, **kwargs):
         if _isstring(file_value):
+            if 'extra_files' in kwargs:
+                params[kwargs['extra_files'][0]] = kwargs['extra_files'][1]
+                kwargs.pop('extra_fields')
             params[file_key] = file_value
             return self._api_request(method, _rectify(params), **kwargs)
         else:
             files = {file_key: file_value}
+            if 'extra_files' in kwargs:
+                files.update({kwargs['extra_files'][0] :kwargs['extra_files'][1]})
+                kwargs.pop('extra_fields')
+
             return self._api_request(method, _rectify(params), files, **kwargs)
 
     def getMe(self):
@@ -649,8 +656,9 @@ class Bot(_BotBase):
 
         :param animation: Same as ``photo`` in :meth:`telepot.Bot.sendPhoto`
         """
-        p = _strip(locals(), more=['animation'])
-        return self._api_request_with_file('sendAnimation', _rectify(p), 'animation', animation)
+        p = _strip(locals(), more=['animation', 'thumb' if thumb else ''])
+        return self._api_request_with_file('sendAnimation', _rectify(p), 'animation', animation,
+                                           extra_files=['thumb', thumb])
 
     def sendVoice(self, chat_id, voice,
                   caption=None,
@@ -858,6 +866,16 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('exportChatInviteLink', _rectify(p))
 
+    def getMyCommands(self):
+        """ See: https://core.telegram.org/bots/api#getmycommands """
+        p = _strip(locals())
+        return self._api_request('getMyCommands', _rectify(p))
+
+    def setMyCommands(self, commands):
+        """ See: https://core.telegram.org/bots/api#setmycommands """
+        p = _strip(locals())
+        return self._api_request('setMyCommands', _rectify(p))
+
     def setChatAdministratorCustomTitle(self, chat_id, user_id, custom_title):
         """ See: https://core.telegram.org/bots/api#setchatadministratorcustomtitle """
         p = _strip(locals())
@@ -1030,6 +1048,15 @@ class Bot(_BotBase):
         p.update(_dismantle_message_identifier(msg_identifier))
         return self._api_request('stopPoll', _rectify(p))
 
+    def sendDice(self, chat_id, text,
+                    emoji=None,
+                    disable_notification=None,
+                    reply_to_message_id=None,
+                    reply_markup=None):
+        """ See: https://core.telegram.org/bots/api#senddice """
+        p = _strip(locals())
+        return self._api_request('sendDice', _rectify(p))
+
     def sendSticker(self, chat_id, sticker,
                     disable_notification=None,
                     reply_to_message_id=None,
@@ -1056,22 +1083,45 @@ class Bot(_BotBase):
         p = _strip(locals(), more=['png_sticker'])
         return self._api_request_with_file('uploadStickerFile', _rectify(p), 'png_sticker', png_sticker)
 
-    def createNewStickerSet(self, user_id, name, title, png_sticker, emojis,
+    def createNewStickerSet(self, user_id, name, title, emojis, png_sticker=None, tgs_sticker=None,
                             contains_masks=None,
                             mask_position=None):
         """
         See: https://core.telegram.org/bots/api#createnewstickerset
         """
-        p = _strip(locals(), more=['png_sticker'])
-        return self._api_request_with_file('createNewStickerSet', _rectify(p), 'png_sticker', png_sticker)
+        if png_sticker:
+            p = _strip(locals(), more=['png_sticker'])
+            return self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        elif tgs_sticker:
+            p = _strip(locals(), more=['tgs_sticker'])
+            return self._api_request_with_file('addStickerToSet', _rectify(p), 'tgs_sticker', tgs_sticker)
+        else:
+            raise ValueError('You must use exactly one of the fields png_sticker or tgs_sticker')
 
-    def addStickerToSet(self, user_id, name, png_sticker, emojis,
+    def addStickerToSet(self, user_id, name, emojis, png_sticker=None, tgs_sticker=None,
                         mask_position=None):
         """
         See: https://core.telegram.org/bots/api#addstickertoset
         """
-        p = _strip(locals(), more=['png_sticker'])
-        return self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        if png_sticker:
+            p = _strip(locals(), more=['png_sticker'])
+            return self._api_request_with_file('addStickerToSet', _rectify(p), 'png_sticker', png_sticker)
+        elif tgs_sticker:
+            p = _strip(locals(), more=['tgs_sticker'])
+            return self._api_request_with_file('addStickerToSet', _rectify(p), 'tgs_sticker', tgs_sticker)
+        else:
+            raise ValueError('You must use exactly one of the fields png_sticker or tgs_sticker')
+
+    def setStickerSetThumb(self, name, user_id, thumb=None):
+        """
+        See: https://core.telegram.org/bots/api#setstickersetthumb
+        """
+        if thumb:
+            p = _strip(locals(), more=['thumb'])
+            return self._api_request_with_file('setStickerSetThumb', _rectify(p), 'thumb', thumb)
+        else:
+            p = _strip(locals())
+            return self._api_request('setStickerSetThumb', _rectify(p))
 
     def setStickerPositionInSet(self, sticker, position):
         """
