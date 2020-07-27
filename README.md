@@ -30,7 +30,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/codingsett/telepota">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="logo.png" alt="Logo">
   </a>
 
   <h3 align="center">Telepota - an actively maintained python3 wrapper for the telegram BOT API.</h3>
@@ -65,8 +65,6 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Acknowledgements](#acknowledgements)
-
-
 
 
 
@@ -157,6 +155,7 @@ _For more examples, please refer to the [Examples Folder](https://github.com/cod
 - [ ] Modify and improve test coverage.
 - [ ] Include github actions in the workflow.
 - [ ] Replace urllib with requests maybe.
+- [ ] Add more examples for new methods included for BOT API.
 - [x] Update telepot to latest BOT API version.
 
 

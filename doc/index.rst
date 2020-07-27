@@ -8,12 +8,11 @@ Introduction
    reference
 
 Telepot helps you build applications for `Telegram Bot API <https://core.telegram.org/bots>`_.
-It works on Python 2.7 and Python 3. For Python 3.5+, it also has an `async version <#async-version-python-3-5>`_
+It works on Python 3. For Python 3.5+, it also has an `async version <#async-version-python-3-5>`_
 based on `asyncio <https://docs.python.org/3/library/asyncio.html>`_.
 
-For a time, I tried to list the features here like many projects do. Eventually, I gave up.
-
 Common and straight-forward features are too trivial to worth listing.
+Please check the telepot reference to know what this libray does in depth.
 For more unique and novel features, I cannot find standard terms to describe them.
 The best way to experience telepot is by reading this page and going through the
 `examples <https://github.com/nickoala/telepot/tree/master/examples>`_. Let's go.
@@ -26,13 +25,13 @@ Installation
 
 pip::
 
-    $ pip install telepot
-    $ pip install telepot --upgrade  # UPGRADE
+    $ pip install telepota
+    $ pip install telepota --upgrade  # UPGRADE
 
 easy_install::
 
-    $ easy_install telepot
-    $ easy_install --upgrade telepot  # UPGRADE
+    $ easy_install telepota
+    $ easy_install --upgrade telepota  # UPGRADE
 
 Get a token
 -----------

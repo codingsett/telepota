@@ -5,6 +5,7 @@ from telepot.loop import MessageLoop
 from telepot.delegate import pave_event_space, per_inline_from_id, create_open
 from telepot.namedtuple import InlineQueryResultArticle, InputTextMessageContent
 
+
 class QueryCounter(telepot.helper.InlineUserHandler, telepot.helper.AnswererMixin):
     def __init__(self, *args, **kwargs):
         super(QueryCounter, self).__init__(*args, **kwargs)
@@ -19,12 +20,12 @@ class QueryCounter(telepot.helper.InlineUserHandler, telepot.helper.AnswererMixi
             text = '%d. %s' % (self._count, query_string)
 
             articles = [InlineQueryResultArticle(
-                            id='abc',
-                            title=text,
-                            input_message_content=InputTextMessageContent(
-                                message_text=text
-                            )
-                       )]
+                id='abc',
+                title=text,
+                input_message_content=InputTextMessageContent(
+                    message_text=text
+                )
+            )]
 
             return articles
 
@@ -33,6 +34,7 @@ class QueryCounter(telepot.helper.InlineUserHandler, telepot.helper.AnswererMixi
     def on_chosen_inline_result(self, msg):
         result_id, from_id, query_string = telepot.glance(msg, flavor='chosen_inline_result')
         print(self.id, ':', 'Chosen Inline Result:', result_id, from_id, query_string)
+
 
 TOKEN = sys.argv[1]  # get token from command-line
 

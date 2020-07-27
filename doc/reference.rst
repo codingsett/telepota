@@ -4,7 +4,7 @@ telepot reference
 
 Telepot has two versions:
 
-- **Traditional version works on Python 2.7 and Python 3.** It uses
+- **Traditional version works on Python 3.** It uses
   `urllib3 <https://urllib3.readthedocs.io/en/latest/>`_ to make HTTP requests,
   and uses threads to achieve delegation by default.
 - **Async version works on Python 3.5 or above.** It is based on
@@ -43,7 +43,7 @@ Some modules do not have async counterparts, e.g. :mod:`telepot.namedtuple` and
 :mod:`telepot.exception`, because they are shared.
 
 Try to combine this reading with the provided
-`examples <https://github.com/nickoala/telepot/tree/master/examples>`_ .
+`examples <https://github.com/codingsett/telepota/tree/master/examples>`_ .
 One example is worth a thousand words. I hope they make things clear.
 
 Basic Bot
@@ -102,7 +102,7 @@ want to implement your own ordering logic, :class:`.Webhook` should not be used.
 In async version, a task of :meth:`.run_forever` should be created instead of
 :meth:`.run_as_thread`.
 
-Refer to `webhook examples <https://github.com/nickoala/telepot/tree/master/examples/webhook>`_
+Refer to `webhook examples <https://github.com/codingsett/telepota/tree/master/examples/webhook>`_
 for usage.
 
 .. autoclass:: telepot.loop.OrderedWebhook
