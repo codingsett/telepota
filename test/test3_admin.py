@@ -46,7 +46,7 @@ class AdminBot(telepot.Bot):
 
         while 1:
             try:
-                self.setChatPhoto(chat_id, open('gandhi.png', 'rb'))
+                self.setChatPhoto(chat_id, open('TestFiles/gandhi.png', 'rb'))
                 print('Set photo successfully.')
                 time.sleep(2)  # let tester see photo briefly
                 break

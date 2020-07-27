@@ -10,11 +10,11 @@ STICKER_SET = sys.argv[3]
 
 bot = telepot.Bot(TOKEN)
 
-f = bot.uploadStickerFile(USER_ID, open('gandhi.png', 'rb'))
+f = bot.uploadStickerFile(USER_ID, open('TestFiles/gandhi.png', 'rb'))
 print('Uploaded Gandhi')
 
 bot.addStickerToSet(USER_ID, STICKER_SET, f['file_id'], '\U0001f60a')
-bot.addStickerToSet(USER_ID, STICKER_SET, open('lincoln.png', 'rb'), '\U0001f60a')
+bot.addStickerToSet(USER_ID, STICKER_SET, open('TestFiles/lincoln.png', 'rb'), '\U0001f60a')
 print('Added Gandhi and Lincoln to set')
 
 s = bot.getStickerSet(STICKER_SET)

@@ -118,7 +118,7 @@ def send_everything_on_contact(msg):
     ##### sendPhoto
 
     bot.sendChatAction(chat_id, 'upload_photo')
-    r = bot.sendPhoto(chat_id, open('lighthouse.jpg', 'rb'))
+    r = bot.sendPhoto(chat_id, open('TestFiles/lighthouse.jpg', 'rb'))
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -135,7 +135,7 @@ def send_everything_on_contact(msg):
     bot.sendPhoto(chat_id, ('abc.jpg', furl))
     time.sleep(0.5)
 
-    bot.sendPhoto(chat_id, ('中文照片.jpg', open('lighthouse.jpg', 'rb')), caption='中文照片')
+    bot.sendPhoto(chat_id, ('中文照片.jpg', open('TestFiles/lighthouse.jpg', 'rb')), caption='中文照片')
     time.sleep(0.5)
 
     ##### getFile
@@ -155,14 +155,14 @@ def send_everything_on_contact(msg):
     bot.download_file(file_id, 'down.1')
 
     print('Open down.2 and download to it ...')
-    with open('down.2', 'wb') as down:
+    with open('TestFiles/down.2', 'wb') as down:
         bot.download_file(file_id, down)
 
     ##### sendAudio
     # Need one of `performer` or `title' for server to regard it as audio. Otherwise, server treats it as voice.
 
     bot.sendChatAction(chat_id, 'upload_audio')
-    r = bot.sendAudio(chat_id, open('dgdg.mp3', 'rb'), title='Ringtone')
+    r = bot.sendAudio(chat_id, open('TestFiles/dgdg.mp3', 'rb'), title='Ringtone')
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -175,13 +175,13 @@ def send_everything_on_contact(msg):
     bot.sendAudio(chat_id, file_id, performer='Ding Dong', reply_markup=nt_remove_keyboard)
     time.sleep(0.5)
 
-    bot.sendAudio(chat_id, ('中文歌.mp3', open('dgdg.mp3', 'rb')), title='中文歌')
+    bot.sendAudio(chat_id, ('中文歌.mp3', open('TestFiles/dgdg.mp3', 'rb')), title='中文歌')
     time.sleep(0.5)
 
     ##### sendDocument
 
     bot.sendChatAction(chat_id, 'upload_document')
-    r = bot.sendDocument(chat_id, open('document.txt', 'rb'))
+    r = bot.sendDocument(chat_id, open('TestFiles/document.txt', 'rb'))
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -193,12 +193,12 @@ def send_everything_on_contact(msg):
     bot.sendDocument(chat_id, file_id, reply_markup=remove_keyboard)
     time.sleep(0.5)
 
-    bot.sendDocument(chat_id, ('中文文件.txt', open('document.txt', 'rb')))
+    bot.sendDocument(chat_id, ('中文文件.txt', open('TestFiles/document.txt', 'rb')))
     time.sleep(0.5)
 
     ##### sendSticker
 
-    r = bot.sendSticker(chat_id, open('gandhi.png', 'rb'))
+    r = bot.sendSticker(chat_id, open('TestFiles/gandhi.png', 'rb'))
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -213,7 +213,7 @@ def send_everything_on_contact(msg):
     ##### sendVideo
 
     bot.sendChatAction(chat_id, 'upload_video')
-    r = bot.sendVideo(chat_id, open('hktraffic.mp4', 'rb'))
+    r = bot.sendVideo(chat_id, open('TestFiles/hktraffic.mp4', 'rb'))
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -244,7 +244,7 @@ def send_everything_on_contact(msg):
 
     ##### sendVoice
 
-    r = bot.sendVoice(chat_id, open('example.ogg', 'rb'))
+    r = bot.sendVoice(chat_id, open('TestFiles/example.ogg', 'rb'))
     examine(r, telepot.namedtuple.Message)
     time.sleep(0.5)
 
@@ -258,11 +258,11 @@ def send_everything_on_contact(msg):
 
     ##### sendVideoNote
 
-    bot.sendVideoNote(chat_id, open('hktraffic.mp4', 'rb'), length=2)
+    bot.sendVideoNote(chat_id, open('TestFiles/hktraffic.mp4', 'rb'), length=2)
 
     ##### sendMediaGroup
 
-    with open('lighthouse.jpg', 'rb') as f1, open('gandhi.png', 'rb') as f2, open('bookshelf.jpg', 'rb') as f3, open(
+    with open('TestFiles/lighthouse.jpg', 'rb') as f1, open('TestFiles/gandhi.png', 'rb') as f2, open('TestFiles/bookshelf.jpg', 'rb') as f3, open(
             'saturn.jpg', 'rb') as f4:
         ms = [
             telepot.namedtuple.InputMediaPhoto(media=f1),
@@ -363,7 +363,7 @@ def ask_for_various_messages():
 
 
 def test_webhook_getupdates_exclusive():
-    bot.setWebhook('https://www.fake.com/fake', open('old.cert', 'rb'))
+    bot.setWebhook('https://www.fake.com/fake', open('TestFiles/old.cert', 'rb'))
     print('Fake webhook set.')
 
     try:
