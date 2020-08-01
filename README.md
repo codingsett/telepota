@@ -44,8 +44,6 @@
     <a href="https://telepota.readthedocs.io"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://t.me/telepota_dev">Ask Questions</a>
-    ·
     <a href="https://github.com/codingsett/telepota/issues/new">Report  Bug</a>
     ·
     <a href="https://github.com/codingsett/telepota/issues/new">Request Feature</a>
