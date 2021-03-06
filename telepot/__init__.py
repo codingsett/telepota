@@ -17,7 +17,7 @@ from . import hack
 
 from . import exception
 
-__version_info__ = (12, 9)
+__version_info__ = (0, 1)
 __version__ = '.'.join(map(str, __version_info__))
 
 
@@ -291,7 +291,7 @@ def _split_input_media_array(media_array):
             x += 1
             name = 'media' + str(x)
             if name in used_names:
-                continue;
+                continue
             yield name
 
     def split_media(input_media, name_generator):
