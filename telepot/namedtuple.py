@@ -445,6 +445,13 @@ PollAnswer = _create_class('PollAnswer', [
     'option_ids'
 ])
 
+MyChatMember = _create_class('MyChatMember', [
+    _Field('chat', constructor=Chat),
+    _Field('actor', constructor=User),
+    'date',
+    'old_chat_member',
+    'new_chat_member'
+])
 # outgoing
 Poll = _create_class('Poll', [
     'id',
@@ -685,6 +692,7 @@ Update = _create_class('Update', [
     _Field('pre_checkout_query', constructor=PreCheckoutQuery),
     _Field('poll', constructor=Poll),
     _Field('poll_answer', constructor=PollAnswer),
+    _Field('my_chat_member', constructor=PollAnswer),
 ])
 
 

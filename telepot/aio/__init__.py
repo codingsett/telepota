@@ -822,7 +822,8 @@ class Bot(_BotBase):
                                                'inline_query',
                                                'chosen_inline_result',
                                                'shipping_query',
-                                               'pre_checkout_query'])
+                                               'pre_checkout_query',
+                                               'my_chat_member'])
 
                 callback(update[key])
             except:
