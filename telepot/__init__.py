@@ -17,7 +17,7 @@ from . import hack
 
 from . import exception
 
-__version_info__ = (0, 1)
+__version_info__ = (0, 11)
 __version__ = '.'.join(map(str, __version_info__))
 
 
@@ -80,7 +80,7 @@ all_content_types = [
     'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message',
     'new_chat_members', 'invoice', 'successful_payment', 'animation', 'passport_data',
-    'poll_data'
+    'poll_data', 'actor'
 ]
 
 
@@ -1343,7 +1343,8 @@ class Bot(_BotBase):
                                            'shipping_query',
                                            'pre_checkout_query',
                                            'poll',
-                                           'poll_answer'])
+                                           'poll_answer',
+                                           'my_chat_member'])
             collect_queue.put(update[key])
             return update['update_id']
 
