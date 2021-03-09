@@ -17,7 +17,7 @@ from . import hack
 
 from . import exception
 
-__version_info__ = (0, 11)
+__version_info__ = (0, 111)
 __version__ = '.'.join(map(str, __version_info__))
 
 
@@ -27,6 +27,7 @@ def flavor(msg):
 
     A message's flavor may be one of these:
 
+    - ``chat``
     - ``chat``
     - ``callback_query``
     - ``inline_query``
@@ -41,6 +42,8 @@ def flavor(msg):
     our_list = ['poll_id', 'question', 'option_ids']
     if 'message_id' in msg and 'passport_data' not in msg:
         return 'chat'
+    elif 'actor' in msg:
+        return 'my_chat_member'
     elif 'message_id' in msg and 'passport_data' in msg:
         return 'all_passport_data'
     elif 'id' in msg and 'chat_instance' in msg:
@@ -145,6 +148,8 @@ def glance(msg, flavor='chat', long=False):
             return content_type, msg['chat']['type'], msg['chat']['id'], msg['date'], msg['message_id']
         else:
             return content_type, msg['chat']['type'], msg['chat']['id']
+    def gl_my_chat_member():
+        return msg
 
     def gl_callback_query():
         return msg['id'], msg['from']['id'], msg['data']
@@ -180,6 +185,7 @@ def glance(msg, flavor='chat', long=False):
 
     try:
         fn = {'chat': gl_chat,
+              'my_chat_member': gl_my_chat_member,
               'callback_query': gl_callback_query,
               'inline_query': gl_inline_query,
               'all_passport_data': gl_all_passport_data,
@@ -639,15 +645,15 @@ class Bot(_BotBase):
         return self._api_request_with_file('sendVideo', _rectify(p), 'video', video)
 
     def sendAnimation(self, chat_id, animation,
-                    duration=None,
-                    width=None,
-                    height=None,
-                    thumb=None,
-                    caption=None,
-                    parse_mode=None,
-                    disable_notification=None,
-                    reply_to_message_id=None,
-                    reply_markup=None):
+                      duration=None,
+                      width=None,
+                      height=None,
+                      thumb=None,
+                      caption=None,
+                      parse_mode=None,
+                      disable_notification=None,
+                      reply_to_message_id=None,
+                      reply_markup=None):
         """
         See: https://core.telegram.org/bots/api#sendanimation
 
@@ -1030,11 +1036,11 @@ class Bot(_BotBase):
         return self._api_request('deleteMessage', _rectify(p))
 
     def sendPoll(self, chat_id, question, options, is_anonymous=None, type=None, allows_multiple_answers=None,
-                    correct_option_id=None, explanation=None, explanation_parse_mode=None, open_period=None,
-                    close_date=None, is_closed=None,
-                    disable_notification=None,
-                    reply_to_message_id=None,
-                    reply_markup=None):
+                 correct_option_id=None, explanation=None, explanation_parse_mode=None, open_period=None,
+                 close_date=None, is_closed=None,
+                 disable_notification=None,
+                 reply_to_message_id=None,
+                 reply_markup=None):
         """ See: https://core.telegram.org/bots/api#sendpoll """
         p = _strip(locals())
         return self._api_request('sendPoll', _rectify(p))
@@ -1050,10 +1056,10 @@ class Bot(_BotBase):
         return self._api_request('stopPoll', _rectify(p))
 
     def sendDice(self, chat_id, text,
-                    emoji=None,
-                    disable_notification=None,
-                    reply_to_message_id=None,
-                    reply_markup=None):
+                 emoji=None,
+                 disable_notification=None,
+                 reply_to_message_id=None,
+                 reply_markup=None):
         """
         Choose between different animations (``dice``, ``darts``, ``basketball``) by specifying the ``emoji`` parameter
         See: https://core.telegram.org/bots/api#senddice
