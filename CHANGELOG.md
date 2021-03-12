@@ -1,4 +1,9 @@
-# telepot changelog
+# telepota changelog
+
+## 1.0 (2021-03-12)
+- Bot API 4.9 to 5.1
+- Changed versioning since this is a new library derived from an old library
+- Minor bug fixes
 
 ## 12.8 (2020-07-27)
 

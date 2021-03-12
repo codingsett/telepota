@@ -137,7 +137,8 @@ class Sender(object):
                        'sendChatAction',
                        'sendAnimation',
                        'sendPoll',
-                       'sendDice']:
+                       'sendDice',
+                       'copyMessage']:
             setattr(self, method, partial(getattr(bot, method), chat_id))
             # Essentially doing:
             #   self.sendMessage = partial(bot.sendMessage, chat_id)

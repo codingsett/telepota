@@ -17,7 +17,7 @@ from . import hack
 
 from . import exception
 
-__version_info__ = (0, 111)
+__version_info__ = (1, 0)
 __version__ = '.'.join(map(str, __version_info__))
 
 
@@ -28,7 +28,6 @@ def flavor(msg):
     A message's flavor may be one of these:
 
     - ``chat``
-    - ``chat``
     - ``callback_query``
     - ``inline_query``
     - ``chosen_inline_result``
@@ -36,14 +35,13 @@ def flavor(msg):
     - ``pre_checkout_query``
     - ``passport_data``
     - ``poll_data``
-
     An event's flavor is determined by the single top-level key.
     """
     our_list = ['poll_id', 'question', 'option_ids']
     if 'message_id' in msg and 'passport_data' not in msg:
         return 'chat'
-    elif 'actor' in msg:
-        return 'my_chat_member'
+    elif 'old_chat_member' in msg:
+        return 'chat'
     elif 'message_id' in msg and 'passport_data' in msg:
         return 'all_passport_data'
     elif 'id' in msg and 'chat_instance' in msg:
@@ -83,7 +81,7 @@ all_content_types = [
     'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'supergroup_chat_created',
     'channel_chat_created', 'migrate_to_chat_id', 'migrate_from_chat_id', 'pinned_message',
     'new_chat_members', 'invoice', 'successful_payment', 'animation', 'passport_data',
-    'poll_data', 'actor'
+    'poll_data', 'voice', 'game', 'chat_member'
 ]
 
 
@@ -148,8 +146,6 @@ def glance(msg, flavor='chat', long=False):
             return content_type, msg['chat']['type'], msg['chat']['id'], msg['date'], msg['message_id']
         else:
             return content_type, msg['chat']['type'], msg['chat']['id']
-    def gl_my_chat_member():
-        return msg
 
     def gl_callback_query():
         return msg['id'], msg['from']['id'], msg['data']
@@ -185,7 +181,6 @@ def glance(msg, flavor='chat', long=False):
 
     try:
         fn = {'chat': gl_chat,
-              'my_chat_member': gl_my_chat_member,
               'callback_query': gl_callback_query,
               'inline_query': gl_inline_query,
               'all_passport_data': gl_all_passport_data,
@@ -367,9 +362,9 @@ def _rectify(params):
 
     # Update markdown to use markdownV2(enhanced version of previous markdown) without need of
     # specifying it in parse_mode
-    if params.get('parse_mode', None):
-        if params['parse_mode'].lower() == 'markdown':
-            params.update({'parse_mode': "MarkdownV2"})
+    # if params.get('parse_mode', None):
+    #     if params['parse_mode'].lower() == 'markdown':
+    #         params.update({'parse_mode': "MarkdownV2"})
 
     def make_jsonable(value):
         if isinstance(value, list):
@@ -562,6 +557,8 @@ class Bot(_BotBase):
 
     def sendMessage(self, chat_id, text,
                     parse_mode=None,
+                    entities=None,
+                    allow_sending_without_reply=None,
                     disable_web_page_preview=None,
                     disable_notification=None,
                     reply_to_message_id=None,
@@ -577,6 +574,8 @@ class Bot(_BotBase):
         return self._api_request('forwardMessage', _rectify(p))
 
     def sendPhoto(self, chat_id, photo,
+                  entities=None,
+                  allow_sending_without_reply=None,
                   caption=None,
                   parse_mode=None,
                   disable_notification=None,
@@ -598,6 +597,8 @@ class Bot(_BotBase):
     def sendAudio(self, chat_id, audio,
                   caption=None,
                   parse_mode=None,
+                  entities=None,
+                  allow_sending_without_reply=None,
                   duration=None,
                   performer=None,
                   title=None,
@@ -613,10 +614,15 @@ class Bot(_BotBase):
         return self._api_request_with_file('sendAudio', _rectify(p), 'audio', audio)
 
     def sendDocument(self, chat_id, document,
+                     thumb=None,
                      caption=None,
+                     caption_entities=None,
+                     disable_content_type_detection=None,
                      parse_mode=None,
+                     entities=None,
                      disable_notification=None,
                      reply_to_message_id=None,
+                     allow_sending_without_reply=None,
                      reply_markup=None):
         """
         See: https://core.telegram.org/bots/api#senddocument
@@ -632,6 +638,8 @@ class Bot(_BotBase):
                   height=None,
                   caption=None,
                   parse_mode=None,
+                  entities=None,
+                  allow_sending_without_reply=None,
                   supports_streaming=None,
                   disable_notification=None,
                   reply_to_message_id=None,
@@ -651,6 +659,8 @@ class Bot(_BotBase):
                       thumb=None,
                       caption=None,
                       parse_mode=None,
+                      entities=None,
+                      allow_sending_without_reply=None,
                       disable_notification=None,
                       reply_to_message_id=None,
                       reply_markup=None):
@@ -670,6 +680,8 @@ class Bot(_BotBase):
     def sendVoice(self, chat_id, voice,
                   caption=None,
                   parse_mode=None,
+                  entities=None,
+                  allow_sending_without_reply=None,
                   duration=None,
                   disable_notification=None,
                   reply_to_message_id=None,
@@ -685,6 +697,7 @@ class Bot(_BotBase):
     def sendVideoNote(self, chat_id, video_note,
                       duration=None,
                       length=None,
+                      allow_sending_without_reply=None,
                       disable_notification=None,
                       reply_to_message_id=None,
                       reply_markup=None):
@@ -703,7 +716,8 @@ class Bot(_BotBase):
 
     def sendMediaGroup(self, chat_id, media,
                        disable_notification=None,
-                       reply_to_message_id=None):
+                       reply_to_message_id=None,
+                       allow_sending_without_reply=None):
         """
         See: https://core.telegram.org/bots/api#sendmediagroup
 
@@ -743,8 +757,24 @@ class Bot(_BotBase):
         p['media'] = legal_media
         return self._api_request('editMessageMedia', _rectify(p), files_to_attach)
 
+    def copyMessage(self, chat_id, from_chat_id, message_id,
+                     caption=None,
+                     caption_entities=None,
+                     reply_to_message_id=None,
+                     allow_sending_without_reply=None,
+                     disable_notification=None,
+                     parse_mode=None,
+                     reply_markup=None):
+        """ See: https://core.telegram.org/bots/api#copymessage """
+        p = _strip(locals())
+        return self._api_request('copyMessage', _rectify(p))
+
     def sendLocation(self, chat_id, latitude, longitude,
                      live_period=None,
+                     horizontal_accuracy=None,
+                     heading=None,
+                     proximity_alert_radius=None,
+                     allow_sending_without_reply=None,
                      disable_notification=None,
                      reply_to_message_id=None,
                      reply_markup=None):
@@ -753,6 +783,9 @@ class Bot(_BotBase):
         return self._api_request('sendLocation', _rectify(p))
 
     def editMessageLiveLocation(self, msg_identifier, latitude, longitude,
+                                horizontal_accuracy=None,
+                                heading=None,
+                                proximity_alert_radius=None,
                                 reply_markup=None):
         """
         See: https://core.telegram.org/bots/api#editmessagelivelocation
@@ -777,8 +810,11 @@ class Bot(_BotBase):
     def sendVenue(self, chat_id, latitude, longitude, title, address,
                   foursquare_id=None,
                   foursquare_type=None,
+                  google_place_id=None,
+                  google_place_type=None,
                   disable_notification=None,
                   reply_to_message_id=None,
+                  allow_sending_without_reply=None,
                   reply_markup=None):
         """ See: https://core.telegram.org/bots/api#sendvenue """
         p = _strip(locals())
@@ -789,6 +825,7 @@ class Bot(_BotBase):
                     vcard=None,
                     disable_notification=None,
                     reply_to_message_id=None,
+                    allow_sending_without_reply=None,
                     reply_markup=None):
         """ See: https://core.telegram.org/bots/api#sendcontact """
         p = _strip(locals())
@@ -797,6 +834,7 @@ class Bot(_BotBase):
     def sendGame(self, chat_id, game_short_name,
                  disable_notification=None,
                  reply_to_message_id=None,
+                 allow_sending_without_reply=None,
                  reply_markup=None):
         """ See: https://core.telegram.org/bots/api#sendgame """
         p = _strip(locals())
@@ -816,6 +854,7 @@ class Bot(_BotBase):
                     is_flexible=None,
                     disable_notification=None,
                     reply_to_message_id=None,
+                    allow_sending_without_reply=None,
                     reply_markup=None):
         """ See: https://core.telegram.org/bots/api#sendinvoice """
         p = _strip(locals())
@@ -838,13 +877,30 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('getFile', _rectify(p))
 
+    def createChatInviteLink(self, chat_id, expire_date=None,
+                       member_limit=None):
+        """ See: https://core.telegram.org/bots/api#createChatInviteLink """
+        p = _strip(locals())
+        return self._api_request('createChatInviteLink', _rectify(p))
+
+    def editChatInviteLink(self, chat_id, invite_link,
+                             expire_date=None, member_limit=None):
+        """ See: https://core.telegram.org/bots/api#editChatInviteLink """
+        p = _strip(locals())
+        return self._api_request('editChatInviteLink', _rectify(p))
+
+    def revokeChatInviteLink(self, chat_id, invite_link):
+        """ See: https://core.telegram.org/bots/api#revokeChatInviteLink """
+        p = _strip(locals())
+        return self._api_request('revokeChatInviteLink', _rectify(p))
+
     def kickChatMember(self, chat_id, user_id,
-                       until_date=None):
+                       until_date=None, revoke_messages=None):
         """ See: https://core.telegram.org/bots/api#kickchatmember """
         p = _strip(locals())
         return self._api_request('kickChatMember', _rectify(p))
 
-    def unbanChatMember(self, chat_id, user_id):
+    def unbanChatMember(self, chat_id, user_id, only_if_banned=None):
         """ See: https://core.telegram.org/bots/api#unbanchatmember """
         p = _strip(locals())
         return self._api_request('unbanChatMember', _rectify(p))
@@ -856,6 +912,9 @@ class Bot(_BotBase):
         return self._api_request('restrictChatMember', _rectify(p))
 
     def promoteChatMember(self, chat_id, user_id,
+                          is_anonymous = None,
+                          can_manage_chat = None,
+                          can_manage_voice_chats = None,
                           can_change_info=None,
                           can_post_messages=None,
                           can_edit_messages=None,
@@ -920,10 +979,15 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('pinChatMessage', _rectify(p))
 
-    def unpinChatMessage(self, chat_id):
+    def unpinChatMessage(self, chat_id, message_id=None):
         """ See: https://core.telegram.org/bots/api#unpinchatmessage """
         p = _strip(locals())
         return self._api_request('unpinChatMessage', _rectify(p))
+
+    def unpinAllChatMessages(self, chat_id):
+        """ See: https://core.telegram.org/bots/api#unpinallchatmessages """
+        p = _strip(locals())
+        return self._api_request('unpinAllChatMessages', _rectify(p))
 
     def leaveChat(self, chat_id):
         """ See: https://core.telegram.org/bots/api#leavechat """
@@ -984,6 +1048,7 @@ class Bot(_BotBase):
 
     def editMessageText(self, msg_identifier, text,
                         parse_mode=None,
+                        entities=None,
                         disable_web_page_preview=None,
                         reply_markup=None):
         """
@@ -1001,6 +1066,7 @@ class Bot(_BotBase):
 
     def editMessageCaption(self, msg_identifier,
                            caption=None,
+                           entities=None,
                            parse_mode=None,
                            reply_markup=None):
         """
@@ -1036,6 +1102,8 @@ class Bot(_BotBase):
         return self._api_request('deleteMessage', _rectify(p))
 
     def sendPoll(self, chat_id, question, options, is_anonymous=None, type=None, allows_multiple_answers=None,
+                 entities=None,
+                 allow_sending_without_reply=None,
                  correct_option_id=None, explanation=None, explanation_parse_mode=None, open_period=None,
                  close_date=None, is_closed=None,
                  disable_notification=None,
@@ -1059,6 +1127,7 @@ class Bot(_BotBase):
                  emoji=None,
                  disable_notification=None,
                  reply_to_message_id=None,
+                 allow_sending_without_reply=None,
                  reply_markup=None):
         """
         Choose between different animations (``dice``, ``darts``, ``basketball``) by specifying the ``emoji`` parameter
@@ -1070,6 +1139,7 @@ class Bot(_BotBase):
     def sendSticker(self, chat_id, sticker,
                     disable_notification=None,
                     reply_to_message_id=None,
+                    allow_sending_without_reply=None,
                     reply_markup=None):
         """
         See: https://core.telegram.org/bots/api#sendsticker
@@ -1168,9 +1238,11 @@ class Bot(_BotBase):
 
     def setWebhook(self,
                    url=None,
+                   ip_address=None,
                    certificate=None,
                    max_connections=None,
-                   allowed_updates=None):
+                   allowed_updates=None,
+                   drop_pending_updates=None):
         """ See: https://core.telegram.org/bots/api#setwebhook """
         p = _strip(locals(), more=['certificate'])
 
@@ -1180,9 +1252,10 @@ class Bot(_BotBase):
         else:
             return self._api_request('setWebhook', _rectify(p))
 
-    def deleteWebhook(self):
+    def deleteWebhook(self, drop_pending_updates=None):
         """ See: https://core.telegram.org/bots/api#deletewebhook """
-        return self._api_request('deleteWebhook')
+        p = _strip(locals())
+        return self._api_request('deleteWebhook', _rectify(p))
 
     def getWebhookInfo(self):
         """ See: https://core.telegram.org/bots/api#getwebhookinfo """
@@ -1350,7 +1423,8 @@ class Bot(_BotBase):
                                            'pre_checkout_query',
                                            'poll',
                                            'poll_answer',
-                                           'my_chat_member'])
+                                           'my_chat_member',
+                                           'chat_member'])
             collect_queue.put(update[key])
             return update['update_id']
 

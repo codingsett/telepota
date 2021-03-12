@@ -33,7 +33,7 @@ def _apply_entities(text, entities, escape_map, format_map):
 
 def apply_entities_as_markdown(text, entities):
     """
-    Format text as MarkdownV2. Also take care of escaping special characters.
+    Format text as Markdown. Also take care of escaping special characters.
     Returned value can be passed to :meth:`.Bot.sendMessage` with appropriate
     ``parse_mode``.
 

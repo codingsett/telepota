@@ -175,6 +175,7 @@ Audio = _create_class('Audio', [
     'duration',
     'performer',
     'title',
+    'file_name',
     'mime_type',
     'file_size',
     _Field('thumb', constructor=PhotoSize)
@@ -254,6 +255,7 @@ Video = _create_class('Video', [
     'height',
     'duration',
     _Field('thumb', constructor=PhotoSize),
+    'file_name',
     'mime_type',
     'file_unique_id',
     'file_size',
@@ -291,7 +293,11 @@ Contact = _create_class('Contact', [
 # incoming
 Location = _create_class('Location', [
     'longitude',
-    'latitude'
+    'latitude',
+    'horizontal_accuracy',
+    'live_period',
+    'heading',
+    'proximity_alert_radius'
 ])
 
 # incoming
@@ -331,9 +337,12 @@ ChatMember = _create_class('ChatMember', [
     _Field('user', constructor=User),
     'status',
     'custom_title',
+    'is_anonymous',
     'is_member',
     'until_date',
     'can_be_edited',
+    'can_manage_chat',
+    'can_manage_voice_chats',
     'can_change_info',
     'can_post_messages',
     'can_edit_messages',
@@ -353,6 +362,26 @@ ChatMember = _create_class('ChatMember', [
 def ChatMemberArray(data):
     return [ChatMember(**p) for p in data]
 
+# incoming
+ChatInviteLink = _create_class('ChatInviteLink', [
+    'invite_link',
+    _Field('creator', constructor=User),
+    'is_primary',
+    'date',
+    'is_revoked',
+    'expire_date',
+    'member_limit'
+])
+
+# incoming
+ChatMemberUpdated = _create_class('ChatMemberUpdated', [
+    _Field('chat', constructor=Chat),
+    _Field('from_', constructor=User),
+    'date',
+    _Field('old_chat_member', constructor=ChatMember),
+    _Field('new_chat_member', constructor=ChatMember),
+    _Field('invite_link', constructor=ChatInviteLink),
+])
 
 # outgoing
 ReplyKeyboardMarkup = _create_class('ReplyKeyboardMarkup', [
@@ -445,13 +474,6 @@ PollAnswer = _create_class('PollAnswer', [
     'option_ids'
 ])
 
-MyChatMember = _create_class('MyChatMember', [
-    _Field('chat', constructor=Chat),
-    _Field('actor', constructor=User),
-    'date',
-    'old_chat_member',
-    'new_chat_member'
-])
 # outgoing
 Poll = _create_class('Poll', [
     'id',
@@ -596,12 +618,34 @@ Dice = _create_class('Dice', [
     'value',
 ])
 
+MessageAutoDeleteTimerChanged = _create_class('MessageAutoDeleteTimerChanged', [
+    'message_auto_delete_time'
+])
+
+VoiceChatStarted = _create_class('VoiceChatStarted', [
+
+])
+
+VoiceChatEnded = _create_class('VoiceChatEnded', [
+    'duration'
+])
+
+VoiceChatParticipantsInvited = _create_class('VoiceChatParticipantsInvited', [
+    _Field('users', constructor=UserArray)
+])
+
+ProximityAlertTriggered = _create_class('ProximityAlertTriggered', [
+    _Field('traveler', constructor=User),
+    _Field('watcher', constructor=User),
+    'distance'
+])
 # incoming
 Message = _create_class('Message', [
     'message_id',
     _Field('from_', constructor=User),
     _Field('via_bot', constructor=User),
     'date',
+    _Field('sender_chat', constructor=Chat),
     _Field('chat', constructor=Chat),
     _Field('forward_from', constructor=User),
     _Field('forward_from_chat', constructor=Chat),
@@ -639,6 +683,7 @@ Message = _create_class('Message', [
     'group_chat_created',
     'supergroup_chat_created',
     'channel_chat_created',
+    _Field('message_auto_delete_timer_changed', constructor=MessageAutoDeleteTimerChanged),
     'migrate_to_chat_id',
     'migrate_from_chat_id',
     _Field('pinned_message', constructor=_Message),
@@ -646,6 +691,10 @@ Message = _create_class('Message', [
     _Field('successful_payment', constructor=SuccessfulPayment),
     'connected_website',
     _Field('passport_data', constructor=PassportData),
+    _Field('proximity_alert_triggered', constructor=ProximityAlertTriggered),
+    _Field('voice_chat_started', constructor=VoiceChatStarted),
+    _Field('voice_chat_ended', constructor=VoiceChatEnded),
+    _Field('voice_chat_participants_invited', constructor=VoiceChatParticipantsInvited),
     'reply_markup'
 ])
 
@@ -692,7 +741,8 @@ Update = _create_class('Update', [
     _Field('pre_checkout_query', constructor=PreCheckoutQuery),
     _Field('poll', constructor=Poll),
     _Field('poll_answer', constructor=PollAnswer),
-    _Field('my_chat_member', constructor=PollAnswer),
+    _Field('my_chat_member', constructor=ChatMemberUpdated),
+    _Field('chat_member', constructor=ChatMemberUpdated),
 ])
 
 
@@ -706,8 +756,11 @@ WebhookInfo = _create_class('WebhookInfo', [
     'url',
     'has_custom_certificate',
     'pending_update_count',
+    'ip_address',
     'last_error_date',
     'last_error_message',
+    'max_connections',
+    'allowed_updates'
 ])
 
 # outgoing
@@ -722,6 +775,9 @@ InputLocationMessageContent = _create_class('InputLocationMessageContent', [
     'latitude',
     'longitude',
     'live_period',
+    'horizontal_accuracy',
+    'heading',
+    'proximity_alert_radius'
 ])
 
 # outgoing
@@ -732,6 +788,8 @@ InputVenueMessageContent = _create_class('InputVenueMessageContent', [
     'address',
     'foursquare_id',
     'foursquare_type',
+    'google_place_id',
+    'google_place_type'
 ])
 
 # outgoing
@@ -755,6 +813,7 @@ InlineQueryResultArticle = _create_class('InlineQueryResultArticle', [
     'thumb_url',
     'thumb_width',
     'thumb_height',
+    'caption_entities'
 ])
 
 # outgoing
@@ -771,6 +830,7 @@ InlineQueryResultPhoto = _create_class('InlineQueryResultPhoto', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -788,6 +848,7 @@ InlineQueryResultGif = _create_class('InlineQueryResultGif', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -805,6 +866,7 @@ InlineQueryResultMpeg4Gif = _create_class('InlineQueryResultMpeg4Gif', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -823,6 +885,7 @@ InlineQueryResultVideo = _create_class('InlineQueryResultVideo', [
     'description',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -837,6 +900,7 @@ InlineQueryResultAudio = _create_class('InlineQueryResultAudio', [
     'audio_duration',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -850,6 +914,7 @@ InlineQueryResultVoice = _create_class('InlineQueryResultVoice', [
     'voice_duration',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -867,6 +932,7 @@ InlineQueryResultDocument = _create_class('InlineQueryResultDocument', [
     'thumb_url',
     'thumb_width',
     'thumb_height',
+    'caption_entities'
 ])
 
 # outgoing
@@ -876,12 +942,16 @@ InlineQueryResultLocation = _create_class('InlineQueryResultLocation', [
     'latitude',
     'longitude',
     'title',
+    'horizontal_accuracy',
     'live_period',
+    'heading',
+    'proximity_alert_radius',
     'reply_markup',
     'input_message_content',
     'thumb_url',
     'thumb_width',
     'thumb_height',
+    'caption_entities'
 ])
 
 # outgoing
@@ -894,11 +964,14 @@ InlineQueryResultVenue = _create_class('InlineQueryResultVenue', [
     'address',
     'foursquare_id',
     'foursquare_type',
+    'google_place_id',
+    'google_place_type',
     'reply_markup',
     'input_message_content',
     'thumb_url',
     'thumb_width',
     'thumb_height',
+    'caption_entities'
 ])
 
 # outgoing
@@ -914,6 +987,7 @@ InlineQueryResultContact = _create_class('InlineQueryResultContact', [
     'thumb_url',
     'thumb_width',
     'thumb_height',
+    'caption_entities'
 ])
 
 # outgoing
@@ -922,6 +996,7 @@ InlineQueryResultGame = _create_class('InlineQueryResultGame', [
     'id',
     'game_short_name',
     'reply_markup',
+    'caption_entities'
 ])
 
 # outgoing
@@ -935,6 +1010,7 @@ InlineQueryResultCachedPhoto = _create_class('InlineQueryResultCachedPhoto', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -947,6 +1023,7 @@ InlineQueryResultCachedGif = _create_class('InlineQueryResultCachedGif', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -959,6 +1036,7 @@ InlineQueryResultCachedMpeg4Gif = _create_class('InlineQueryResultCachedMpeg4Gif
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -968,6 +1046,7 @@ InlineQueryResultCachedSticker = _create_class('InlineQueryResultCachedSticker',
     'sticker_file_id',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -981,6 +1060,7 @@ InlineQueryResultCachedDocument = _create_class('InlineQueryResultCachedDocument
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -994,6 +1074,7 @@ InlineQueryResultCachedVideo = _create_class('InlineQueryResultCachedVideo', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -1006,6 +1087,7 @@ InlineQueryResultCachedVoice = _create_class('InlineQueryResultCachedVoice', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -1017,6 +1099,7 @@ InlineQueryResultCachedAudio = _create_class('InlineQueryResultCachedAudio', [
     'parse_mode',
     'reply_markup',
     'input_message_content',
+    'caption_entities'
 ])
 
 # outgoing
@@ -1025,6 +1108,7 @@ InputMediaPhoto = _create_class('InputMediaPhoto', [
     'media',
     'caption',
     'parse_mode',
+    'caption_entities'
 ])
 
 common_input_media = [
@@ -1042,12 +1126,14 @@ InputMediaVideo = _create_class('InputMediaVideo', [
     _Field('type', default='video'),
     *common_input_media,
     'supports_streaming',
+    'caption_entities'
 ])
 
 # outgoing
 InputMediaAnimation = _create_class('InputMediaAnimation', [
     _Field('type', default='animation'),
-    *common_input_media
+    *common_input_media,
+    'caption_entities'
 ])
 
 # outgoing
@@ -1059,7 +1145,8 @@ InputMediaAudio = _create_class('InputMediaAudio', [
     'parse_mode',
     'duration',
     'performer',
-    'title'
+    'title',
+    'caption_entities'
 ])
 
 # outgoing
@@ -1069,6 +1156,8 @@ InputMediaDocument = _create_class('InputMediaAudio', [
     _Field('thumb', constructor=PhotoSize),
     'caption',
     'parse_mode',
+    'disable_content_type_detection',
+    'caption_entities'
 ])
 
 common_passport_fields = [
