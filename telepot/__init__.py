@@ -937,7 +937,7 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('getMyCommands', _rectify(p))
 
-    def setMyCommands(self, commands):
+    def setMyCommands(self, commands, scope=None):
         """ See: https://core.telegram.org/bots/api#setmycommands """
         p = _strip(locals())
         return self._api_request('setMyCommands', _rectify(p))
