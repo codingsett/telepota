@@ -98,12 +98,21 @@ def _extract_message(update):
                                    'edited_message',
                                    'channel_post',
                                    'edited_channel_post',
+                                   'business_connection',
+                                   'business_message',
+                                   'edited_business_message',
+                                   'deleted_business_messages',
+                                   'message_reaction',
+                                   'message_reaction_count',
                                    'callback_query',
                                    'inline_query',
                                    'chosen_inline_result',
                                    'shipping_query',
                                    'pre_checkout_query',
-                                   'my_chat_member'])
+                                   'my_chat_member',
+                                   'chat_join_request',
+                                   'chat_boost',
+                                   'removed_chat_boost'])
     return key, update[key]
 
 
