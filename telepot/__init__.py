@@ -937,7 +937,7 @@ class Bot(_BotBase):
         p = _strip(locals())
         return self._api_request('getMyCommands', _rectify(p))
 
-    def setMyCommands(self, commands):
+    def setMyCommands(self, commands, scope=None):
         """ See: https://core.telegram.org/bots/api#setmycommands """
         p = _strip(locals())
         return self._api_request('setMyCommands', _rectify(p))
@@ -1415,6 +1415,12 @@ class Bot(_BotBase):
                                            'edited_message',
                                            'channel_post',
                                            'edited_channel_post',
+                                           'business_connection',
+                                           'business_message',
+                                           'edited_business_message',
+                                           'deleted_business_messages',
+                                           'message_reaction',
+                                           'message_reaction_count',
                                            'callback_query',
                                            'passport_data',
                                            'inline_query',
@@ -1424,7 +1430,10 @@ class Bot(_BotBase):
                                            'poll',
                                            'poll_answer',
                                            'my_chat_member',
-                                           'chat_member'])
+                                           'chat_member',
+                                           'chat_join_request',
+                                           'chat_boost',
+                                           'removed_chat_boost'])
             collect_queue.put(update[key])
             return update['update_id']
 
